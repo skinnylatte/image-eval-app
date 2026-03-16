@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 import streamlit as st
 
 from config import BIAS_CATEGORIES, MODELS, PROMPT_TARGET, PHASE_ANNOTATE, PHASE_RESULTS
-from data import generate_images, annotation_count
-from components import show_image_grid
+from data import annotation_count
+from components import generate_with_progress, show_image_grid
 
 
 def run():
@@ -55,19 +55,18 @@ def run():
                 st.error("Please select at least one model")
             else:
                 prompt_idx = len(st.session_state.prompts)
-                for mk in models_to_test:
-                    with st.spinner(f"Generating from {MODELS[mk]}..."):
-                        result = generate_images(custom_prompt, mk, num_images)
-                        key = f"{mk}_{prompt_idx}"
-                        st.session_state.generated_images[key] = {
-                            "prompt": custom_prompt,
-                            "category": category,
-                            "model": mk,
-                            "model_name": MODELS[mk],
-                            "result": result,
-                            "timestamp": datetime.now(timezone.utc).isoformat(),
-                            "prompt_idx": prompt_idx,
-                        }
+                results = generate_with_progress(custom_prompt, models_to_test, num_images)
+                for mk, result in results.items():
+                    key = f"{mk}_{prompt_idx}"
+                    st.session_state.generated_images[key] = {
+                        "prompt": custom_prompt,
+                        "category": category,
+                        "model": mk,
+                        "model_name": MODELS[mk],
+                        "result": result,
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "prompt_idx": prompt_idx,
+                    }
                 st.session_state.prompts.append({
                     "prompt": custom_prompt,
                     "category": category,

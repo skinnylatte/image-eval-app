@@ -1,8 +1,32 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import streamlit as st
 
 from config import SCORING_RUBRIC, MODELS
+from data import generate_images
+
+
+def generate_with_progress(prompt: str, model_keys: List[str], num_images: int = 4) -> Dict[str, Dict]:
+    """Generate images from multiple models with a visible status container."""
+    results = {}
+    total = len(model_keys)
+    with st.status(f"Generating images from {total} models...", expanded=True) as status:
+        for i, mk in enumerate(model_keys):
+            st.write(f"Generating from **{MODELS[mk]}**... ({i + 1} of {total})")
+            results[mk] = generate_images(prompt, mk, num_images)
+
+            result = results[mk]
+            if result["status"] == "success":
+                n = len(result["images"])
+                st.write(f"**{MODELS[mk]}** — {n} image{'s' if n != 1 else ''} generated")
+            elif result["status"] == "refused":
+                st.write(f"**{MODELS[mk]}** — refused by safety filter")
+            else:
+                msg = result.get("message", "")[:80]
+                st.write(f"**{MODELS[mk]}** — error: {msg}")
+
+        status.update(label=f"Done — {total} models complete", state="complete", expanded=False)
+    return results
 
 
 def show_image_grid(result: Dict, max_per_row: int = 4):

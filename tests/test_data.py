@@ -174,6 +174,6 @@ class TestGenerateImages:
                      "DASHSCOPE_API_KEY", "REPLICATE_API_TOKEN"]:
             os.environ.pop(var, None)
 
-        for model_key in ["dalle", "stable_diffusion", "imagen", "qwen"]:
+        for model_key in ["dalle", "stable_diffusion", "imagen"]:
             result = data_mod.generate_images("A doctor", model_key, 1)
             assert result["status"] == "error", f"{model_key} should fail without API key"

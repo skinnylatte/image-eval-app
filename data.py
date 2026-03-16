@@ -134,7 +134,7 @@ def _generate_dalle(prompt: str, num_images: int) -> Dict:
 
 @_generator("stable_diffusion")
 def _generate_stable_diffusion(prompt: str, num_images: int) -> Dict:
-    api_url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+    api_url = "https://router.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
     headers = {"Authorization": f"Bearer {_require_env('HF_API_TOKEN')}"}
     images = []
     for _ in range(num_images):

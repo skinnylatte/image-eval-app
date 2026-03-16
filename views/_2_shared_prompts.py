@@ -1,7 +1,8 @@
 import streamlit as st
 from config import SHARED_PROMPTS, MODELS, BIAS_CATEGORIES, PHASE_EXPLORE
-from data import generate_images, build_annotation, save_annotation
+from data import build_annotation, save_annotation
 from components import (
+    generate_with_progress,
     show_model_comparison,
     render_scoring_form,
     render_qualitative_fields,
@@ -42,11 +43,7 @@ def run():
     gen_key = f"shared_{idx}_results"
     if gen_key not in st.session_state:
         if st.button("Generate images from all models", type="primary", use_container_width=True):
-            results = {}
-            for mk in models:
-                with st.spinner(f"Generating from {MODELS[mk]}..."):
-                    results[mk] = generate_images(prompt, mk)
-            st.session_state[gen_key] = results
+            st.session_state[gen_key] = generate_with_progress(prompt, models)
             st.rerun()
         return
 

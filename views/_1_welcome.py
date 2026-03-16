@@ -30,7 +30,7 @@ def run():
         community authentically and respectfully. We're comparing models
         from the US, China, and Google:
 
-        **DALL-E 3** (OpenAI) · **Stable Diffusion XL** (Stability AI) · **Flux 1.1 Pro** (Black Forest Labs) · **Google Imagen 4** · **Qwen-Image** (Alibaba) · **Hunyuan Image 3.0** (Tencent)
+        **DALL-E 3** (OpenAI) · **Stable Diffusion XL** (Stability AI) · **Flux 1.1 Pro** (Black Forest Labs) · **Google Imagen 4** · **Hunyuan Image 3.0** (Tencent)
 
         **Your role:** Use your lived experience as an expert to uncover biases these systems have.
 

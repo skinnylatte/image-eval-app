@@ -3,7 +3,6 @@ MODELS = {
     "stable_diffusion": "Stable Diffusion XL",
     "flux": "Flux 1.1 Pro",
     "imagen": "Google Imagen 4",
-    "qwen": "Qwen-Image",
     "hunyuan": "Hunyuan Image 3.0",
 }
 

@@ -1,7 +1,11 @@
 MODELS = {
-    "stable_diffusion": "Stable Diffusion XL",
     "dalle": "DALL-E 3",
-    "midjourney": "Midjourney",
+    "stable_diffusion": "Stable Diffusion XL",
+    "flux": "Flux 1.1 Pro",
+    "imagen": "Google Imagen 4",
+    "qwen": "Qwen-Image",
+    "seedream": "Seedream 4.5",
+    "hunyuan": "Hunyuan Image 3.0",
 }
 
 BIAS_CATEGORIES = {
@@ -62,6 +66,24 @@ SHARED_PROMPTS = [
 PROMPT_TARGET = 8
 
 BACKGROUNDS = ["Pakistan", "Iran", "Turkey", "Egypt"]
+
+PARTICIPANT_TOKENS = {
+    "oxford-2026-001",
+    "oxford-2026-002",
+    "oxford-2026-003",
+    "oxford-2026-004",
+    "oxford-2026-005",
+    "oxford-2026-006",
+    "oxford-2026-007",
+    "oxford-2026-008",
+    "oxford-2026-009",
+    "oxford-2026-010",
+    "oxford-2026-011",
+    "oxford-2026-012",
+    "oxford-2026-013",
+    "oxford-2026-014",
+    "oxford-2026-015",
+}
 
 PHASE_WELCOME = "welcome"
 PHASE_SHARED = "shared_prompts"

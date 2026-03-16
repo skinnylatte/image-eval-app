@@ -1,10 +1,23 @@
 import streamlit as st
-from config import BACKGROUNDS, PHASE_SHARED
+from config import BACKGROUNDS, PHASE_SHARED, PARTICIPANT_TOKENS
 from data import generate_anonymous_id, save_identity_mapping
 
 
 def run():
     st.title("Red Team Image Bias Evaluation")
+    st.markdown("---")
+
+    token = st.text_input("Enter your participant token to begin", type="password")
+
+    if not token:
+        st.info("You need a participant token to access this workshop. If you don't have one, contact your facilitator.")
+        return
+
+    if token not in PARTICIPANT_TOKENS:
+        st.error("Invalid token. Please check with your facilitator.")
+        return
+
+    st.success("Token accepted.")
     st.markdown("---")
 
     col1, col2 = st.columns(2)
@@ -80,5 +93,6 @@ def run():
             st.session_state.participant_id = anon_id
             st.session_state.participant_display_name = name.split()[0]
             st.session_state.participant_background = background
+            st.session_state.participant_token = token
             st.session_state.current_phase = PHASE_SHARED
             st.rerun()

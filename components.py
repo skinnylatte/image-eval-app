@@ -17,6 +17,7 @@ def show_image_grid(result: Dict, max_per_row: int = 4):
         for i, img in enumerate(images):
             with cols[i % max_per_row]:
                 try:
+                    # img can be a URL (str) or raw bytes (from HF API)
                     st.image(img, use_container_width=True, caption=f"Image {i + 1}")
                 except Exception as e:
                     st.error(f"Could not load image {i + 1}: {e}")

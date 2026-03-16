@@ -164,8 +164,16 @@ class TestSaveImageToDisk:
 
 
 class TestGenerateImages:
-    def test_placeholder_returns_success(self):
-        result = data_mod.generate_images("A doctor", "dalle", 4)
-        assert result["status"] == "success"
-        assert len(result["images"]) == 4
-        assert result["message"] is None
+    def test_unknown_model_returns_error(self):
+        result = data_mod.generate_images("A doctor", "nonexistent", 4)
+        assert result["status"] == "error"
+        assert "Unknown model" in result["message"]
+
+    def test_missing_api_key_returns_error(self):
+        for var in ["OPENAI_API_KEY", "HF_API_TOKEN", "GOOGLE_API_KEY",
+                     "DASHSCOPE_API_KEY", "BYTEPLUS_API_KEY", "REPLICATE_API_TOKEN"]:
+            os.environ.pop(var, None)
+
+        for model_key in ["dalle", "stable_diffusion", "imagen", "qwen", "seedream"]:
+            result = data_mod.generate_images("A doctor", model_key, 1)
+            assert result["status"] == "error", f"{model_key} should fail without API key"

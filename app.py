@@ -26,7 +26,21 @@ for key, val in _DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
-if st.session_state.participant_id:
+# Redirect: if shared prompts are done, skip straight to explore
+if st.session_state.current_phase == PHASE_SHARED and st.session_state.shared_prompts_completed:
+    st.session_state.current_phase = PHASE_EXPLORE
+
+# Redirect: annotate page requires a selected image
+if st.session_state.current_phase == PHASE_ANNOTATE and "current_image_key" not in st.session_state:
+    st.session_state.current_phase = PHASE_EXPLORE
+
+# Redirect: logged-in phases require a participant
+if st.session_state.current_phase != PHASE_WELCOME and not st.session_state.participant_id:
+    st.session_state.current_phase = PHASE_WELCOME
+
+phase = st.session_state.current_phase
+
+if phase != PHASE_WELCOME and st.session_state.participant_id:
     from data import annotation_count
 
     with st.sidebar:
@@ -39,32 +53,32 @@ if st.session_state.participant_id:
         st.markdown("---")
         st.markdown("**Need a break?** That's okay. Tell your facilitator.")
 
-phase = st.session_state.current_phase
+        st.markdown("---")
+        nav_col1, nav_col2 = st.columns(2)
+        with nav_col1:
+            if phase != PHASE_EXPLORE:
+                if st.button("Explore", use_container_width=True):
+                    st.session_state.current_phase = PHASE_EXPLORE
+                    st.rerun()
+        with nav_col2:
+            if phase != PHASE_RESULTS:
+                if st.button("Results", use_container_width=True):
+                    st.session_state.current_phase = PHASE_RESULTS
+                    st.rerun()
 
-if phase == PHASE_WELCOME:
-    from pages import _1_welcome as page
-    page.run()
+_PAGES = {
+    PHASE_WELCOME: "_1_welcome",
+    PHASE_SHARED: "_2_shared_prompts",
+    PHASE_EXPLORE: "_3_explore",
+    PHASE_ANNOTATE: "_4_annotate",
+    PHASE_RESULTS: "_5_results",
+}
 
-elif phase == PHASE_SHARED:
-    if st.session_state.shared_prompts_completed:
-        st.session_state.current_phase = PHASE_EXPLORE
-        st.rerun()
-    else:
-        from pages import _2_shared_prompts as page
-        page.run()
-
-elif phase == PHASE_EXPLORE:
-    from pages import _3_explore as page
-    page.run()
-
-elif phase == PHASE_ANNOTATE:
-    from pages import _4_annotate as page
-    page.run()
-
-elif phase == PHASE_RESULTS:
-    from pages import _5_results as page
-    page.run()
-
+page_module = _PAGES.get(phase)
+if page_module:
+    import importlib
+    mod = importlib.import_module(f"pages.{page_module}")
+    mod.run()
 else:
     st.error(f"Unknown phase: {phase}")
     st.session_state.current_phase = PHASE_WELCOME

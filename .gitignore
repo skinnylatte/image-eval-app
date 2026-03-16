@@ -1,0 +1,6 @@
+red_team_data/
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/

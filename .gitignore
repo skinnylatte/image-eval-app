@@ -6,3 +6,4 @@ venv/
 .venv/
 .pytest_cache/
 .DS_Store
+tokens.md

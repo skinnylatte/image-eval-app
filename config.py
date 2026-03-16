@@ -66,23 +66,11 @@ PROMPT_TARGET = 8
 
 BACKGROUNDS = ["Pakistan", "Iran", "Turkey", "Egypt"]
 
-PARTICIPANT_TOKENS = {
-    "oxford-2026-001",
-    "oxford-2026-002",
-    "oxford-2026-003",
-    "oxford-2026-004",
-    "oxford-2026-005",
-    "oxford-2026-006",
-    "oxford-2026-007",
-    "oxford-2026-008",
-    "oxford-2026-009",
-    "oxford-2026-010",
-    "oxford-2026-011",
-    "oxford-2026-012",
-    "oxford-2026-013",
-    "oxford-2026-014",
-    "oxford-2026-015",
-}
+import os
+
+PARTICIPANT_TOKENS = set(
+    t.strip() for t in os.environ.get("PARTICIPANT_TOKENS", "").split(",") if t.strip()
+)
 
 PHASE_WELCOME = "welcome"
 PHASE_SHARED = "shared_prompts"

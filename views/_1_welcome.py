@@ -4,7 +4,7 @@ from data import generate_anonymous_id, save_identity_mapping
 
 
 def run():
-    st.title("Red Team Image Bias Evaluation")
+    st.title("Home")
     st.markdown("---")
 
     token = st.text_input("Enter your participant token to begin", type="password")

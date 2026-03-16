@@ -84,7 +84,7 @@ _PAGES = {
 page_module = _PAGES.get(phase)
 if page_module:
     import importlib
-    mod = importlib.import_module(f"pages.{page_module}")
+    mod = importlib.import_module(f"views.{page_module}")
     mod.run()
 else:
     st.error(f"Unknown phase: {phase}")

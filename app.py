@@ -26,17 +26,24 @@ for key, val in _DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
-# Redirect: if shared prompts are done, skip straight to explore
-if st.session_state.current_phase == PHASE_SHARED and st.session_state.shared_prompts_completed:
-    st.session_state.current_phase = PHASE_EXPLORE
+# Fix invalid states before rendering anything.
+# Only one redirect can fire per run — checked in priority order.
+_redirected = False
 
-# Redirect: annotate page requires a selected image
-if st.session_state.current_phase == PHASE_ANNOTATE and "current_image_key" not in st.session_state:
-    st.session_state.current_phase = PHASE_EXPLORE
-
-# Redirect: logged-in phases require a participant
 if st.session_state.current_phase != PHASE_WELCOME and not st.session_state.participant_id:
     st.session_state.current_phase = PHASE_WELCOME
+    _redirected = True
+
+elif st.session_state.current_phase == PHASE_SHARED and st.session_state.shared_prompts_completed:
+    st.session_state.current_phase = PHASE_EXPLORE
+    _redirected = True
+
+elif st.session_state.current_phase == PHASE_ANNOTATE and "current_image_key" not in st.session_state:
+    st.session_state.current_phase = PHASE_EXPLORE
+    _redirected = True
+
+if _redirected:
+    st.rerun()
 
 phase = st.session_state.current_phase
 

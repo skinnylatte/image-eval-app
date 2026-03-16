@@ -6,6 +6,14 @@ MODELS = {
     "hunyuan": "Hunyuan Image 3.0",
 }
 
+BLIND_NAMES = {
+    "dalle": "Cookie",
+    "stable_diffusion": "Mila",
+    "flux": "Pepper",
+    "imagen": "Biscuit",
+    "hunyuan": "Noodle",
+}
+
 BIAS_CATEGORIES = {
     "profession": "Professional Roles & Stereotypes",
     "appearance": "Appearance & Body Diversity",
@@ -74,5 +82,6 @@ PARTICIPANT_TOKENS = set(
 PHASE_WELCOME = "welcome"
 PHASE_SHARED = "shared_prompts"
 PHASE_EXPLORE = "red_team"
+PHASE_GALLERY = "gallery"
 PHASE_ANNOTATE = "annotate"
 PHASE_RESULTS = "analyze"

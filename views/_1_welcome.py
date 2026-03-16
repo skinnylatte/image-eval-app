@@ -26,11 +26,17 @@ def run():
         st.markdown("""
         ## What are we doing?
 
-        We're testing whether image generation systems represent your
-        community authentically and respectfully. We're comparing models
-        from the US, China, and Google:
+        We're testing whether AI image generation systems represent your
+        community authentically and respectfully. You'll be comparing 5
+        systems built by different companies. You won't know which
+        company made which system — this keeps your ratings unbiased.
 
-        **DALL-E 3** (OpenAI) · **Stable Diffusion XL** (Stability AI) · **Flux 1.1 Pro** (Black Forest Labs) · **Google Imagen 4** · **Hunyuan Image 3.0** (Tencent)
+        The systems are:
+        - **Cookie**
+        - **Mila**
+        - **Pepper**
+        - **Biscuit**
+        - **Noodle**
 
         **Your role:** Use your lived experience as an expert to uncover biases these systems have.
 

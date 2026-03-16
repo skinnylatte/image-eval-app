@@ -1,38 +1,43 @@
+import random
 from typing import Dict, List, Optional
 
 import streamlit as st
 
-from config import SCORING_RUBRIC, MODELS
+from config import SCORING_RUBRIC, BLIND_NAMES
 from data import generate_images
 
 
 def generate_with_progress(prompt: str, model_keys: List[str], num_images: int = 4) -> Dict[str, Dict]:
-    """Generate images from multiple models with a visible status container."""
+    # Randomize generation order so position doesn't reveal identity
+    shuffled = list(model_keys)
+    random.shuffle(shuffled)
+
     results = {}
-    total = len(model_keys)
-    with st.status(f"Generating images from {total} models...", expanded=True) as status:
-        for i, mk in enumerate(model_keys):
-            st.write(f"Generating from **{MODELS[mk]}**... ({i + 1} of {total})")
+    total = len(shuffled)
+    with st.status(f"Generating images from {total} systems...", expanded=True) as status:
+        for i, mk in enumerate(shuffled):
+            name = BLIND_NAMES[mk]
+            st.write(f"Asking **{name}**... ({i + 1} of {total})")
             results[mk] = generate_images(prompt, mk, num_images)
 
             result = results[mk]
             if result["status"] == "success":
                 n = len(result["images"])
-                st.write(f"**{MODELS[mk]}** — {n} image{'s' if n != 1 else ''} generated")
+                st.write(f"**{name}** — {n} image{'s' if n != 1 else ''} generated")
             elif result["status"] == "refused":
-                st.write(f"**{MODELS[mk]}** — refused by safety filter")
+                st.write(f"**{name}** — refused to generate")
             else:
                 msg = result.get("message", "")[:80]
-                st.write(f"**{MODELS[mk]}** — error: {msg}")
+                st.write(f"**{name}** — error: {msg}")
 
-        status.update(label=f"Done — {total} models complete", state="complete", expanded=False)
+        status.update(label=f"Done — {total} systems complete", state="complete", expanded=False)
     return results
 
 
 def show_image_grid(result: Dict, max_per_row: int = 4):
     status = result.get("status")
     if status == "refused":
-        st.warning(f"Model refused: {result.get('message', 'No reason given')}")
+        st.warning(f"This system refused to generate images.")
     elif status == "error":
         st.error(f"Error: {result.get('message', 'Unknown error')}")
     else:
@@ -41,19 +46,19 @@ def show_image_grid(result: Dict, max_per_row: int = 4):
         for i, img in enumerate(images):
             with cols[i % max_per_row]:
                 try:
-                    # img can be a URL (str) or raw bytes (from HF API)
                     st.image(img, use_container_width=True, caption=f"Image {i + 1}")
                 except Exception as e:
                     st.error(f"Could not load image {i + 1}: {e}")
 
 
-def show_model_comparison(results: Dict[str, Dict]):
+def show_gallery(results: Dict[str, Dict]):
+    """Show all models' images side by side using blind names."""
     model_keys = list(results.keys())
     cols = st.columns(len(model_keys))
-    for col, key in zip(cols, model_keys):
+    for col, mk in zip(cols, model_keys):
         with col:
-            st.markdown(f"**{MODELS[key]}**")
-            show_image_grid(results[key], max_per_row=2)
+            st.markdown(f"**{BLIND_NAMES[mk]}**")
+            show_image_grid(results[mk], max_per_row=2)
 
 
 def render_scoring_form(key_prefix: str):
@@ -95,11 +100,11 @@ def render_qualitative_fields(key_prefix: str):
 
 
 def render_refusal_field(key_prefix: str):
-    st.warning("This model refused to generate images for this prompt.")
+    st.warning("This system refused to generate images for this prompt.")
     st.markdown("**A refusal is important data.** It tells us the system is erasing rather than stereotyping.")
     st.text_area(
         "Why is this refusal significant? What does it mean for your community's representation?",
-        placeholder="E.g., 'By refusing to show [X], this model erases our existence from professional contexts...'",
+        placeholder="E.g., 'By refusing to show [X], this system erases our existence from professional contexts...'",
         height=150,
         key=f"{key_prefix}_refusal",
     )

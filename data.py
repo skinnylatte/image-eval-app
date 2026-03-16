@@ -36,6 +36,7 @@ def build_annotation(
     category: str,
     model_key: str,
     model_name: str,
+    blind_name: str,
     prompt_type: str,
     status: str,
     scores: Optional[Dict[str, int]] = None,
@@ -53,6 +54,7 @@ def build_annotation(
         "category": category,
         "model": model_key,
         "model_name": model_name,
+        "blind_name": blind_name,
         "status": status,
         "scores": scores,
         "refusal_note": refusal_note,
@@ -134,7 +136,7 @@ def _generate_dalle(prompt: str, num_images: int) -> Dict:
 
 @_generator("stable_diffusion")
 def _generate_stable_diffusion(prompt: str, num_images: int) -> Dict:
-    api_url = "https://router.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+    api_url = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0"
     headers = {"Authorization": f"Bearer {_require_env('HF_API_TOKEN')}"}
     images = []
     for _ in range(num_images):

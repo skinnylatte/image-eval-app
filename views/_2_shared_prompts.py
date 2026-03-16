@@ -1,17 +1,6 @@
 import streamlit as st
-from config import SHARED_PROMPTS, MODELS, BIAS_CATEGORIES, PHASE_EXPLORE
-from data import build_annotation, save_annotation
-from components import (
-    generate_with_progress,
-    show_model_comparison,
-    render_scoring_form,
-    render_qualitative_fields,
-    render_refusal_field,
-    read_scores,
-    read_qualitative_fields,
-    read_refusal_note,
-    validate_annotation,
-)
+from config import SHARED_PROMPTS, MODELS, BIAS_CATEGORIES, PHASE_EXPLORE, PHASE_GALLERY
+from components import generate_with_progress
 
 
 def run():
@@ -40,65 +29,17 @@ def run():
     st.subheader(f'Prompt: "{prompt}"')
     st.caption(f"Category: {BIAS_CATEGORIES[category]}")
 
-    gen_key = f"shared_{idx}_results"
-    if gen_key not in st.session_state:
-        if st.button("Generate images from all models", type="primary", use_container_width=True):
-            st.session_state[gen_key] = generate_with_progress(prompt, models)
-            st.rerun()
-        return
+    if st.button("Generate images from all systems", type="primary", use_container_width=True):
+        results = generate_with_progress(prompt, models)
 
-    results = st.session_state[gen_key]
-    show_model_comparison(results)
-    st.markdown("---")
-
-    st.subheader("Rate each model")
-
-    for mk in models:
-        result = results.get(mk, {})
-        with st.expander(f"Rate: {MODELS[mk]}", expanded=True):
-            prefix = f"shared_{idx}_{mk}"
-            if result.get("status") == "refused":
-                render_refusal_field(prefix)
-            else:
-                render_scoring_form(prefix)
-                render_qualitative_fields(prefix)
-
-    if st.button("Save ratings and continue", type="primary", use_container_width=True):
-        # Validate all models before saving any — avoids duplicates on partial failure.
-        all_valid = True
-        pending = []
-
-        for mk in models:
-            result = results.get(mk, {})
-            prefix = f"shared_{idx}_{mk}"
-
-            if result.get("status") == "refused":
-                note = read_refusal_note(prefix)
-                if not note:
-                    st.error(f"Please explain the significance of {MODELS[mk]}'s refusal.")
-                    all_valid = False
-                else:
-                    pending.append(build_annotation(
-                        prompt=prompt, category=category, model_key=mk,
-                        model_name=MODELS[mk], prompt_type="shared",
-                        status="refused", refusal_note=note,
-                    ))
-            else:
-                scores = read_scores(prefix)
-                exp, auth, harm = read_qualitative_fields(prefix)
-
-                if not validate_annotation(scores, exp, auth, harm):
-                    all_valid = False
-                else:
-                    pending.append(build_annotation(
-                        prompt=prompt, category=category, model_key=mk,
-                        model_name=MODELS[mk], prompt_type="shared",
-                        status="success", scores=scores,
-                        expectation=exp, authenticity_note=auth, harm_note=harm,
-                    ))
-
-        if all_valid:
-            for ann in pending:
-                save_annotation(ann)
-            st.session_state.current_shared_prompt_idx = idx + 1
-            st.rerun()
+        # After rating all models for this shared prompt, _4_annotate will
+        # increment current_shared_prompt_idx via prompt_meta callback
+        st.session_state.current_prompt_results = results
+        st.session_state.current_prompt_meta = {
+            "prompt": prompt,
+            "category": category,
+            "prompt_type": "shared",
+            "shared_prompt_idx": idx,
+        }
+        st.session_state.current_phase = PHASE_GALLERY
+        st.rerun()

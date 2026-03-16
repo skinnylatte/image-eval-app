@@ -70,6 +70,7 @@ class TestBuildAnnotation:
             category="profession",
             model_key="dalle",
             model_name="DALL-E 3",
+            blind_name="Cookie",
             prompt_type="shared",
             status="success",
             scores={"authenticity": 3, "diversity": 4, "respectfulness": 5},
@@ -83,6 +84,7 @@ class TestBuildAnnotation:
         assert ann["prompt"] == "A doctor"
         assert ann["model"] == "dalle"
         assert ann["model_name"] == "DALL-E 3"
+        assert ann["blind_name"] == "Cookie"
         assert ann["prompt_type"] == "shared"
         assert ann["status"] == "success"
         assert ann["scores"]["authenticity"] == 3
@@ -98,6 +100,7 @@ class TestBuildAnnotation:
             category="sensitive",
             model_key="dalle",
             model_name="DALL-E 3",
+            blind_name="Cookie",
             prompt_type="free",
             status="refused",
             refusal_note="Erasure of political expression",
@@ -119,6 +122,7 @@ class TestSaveLoadAnnotations:
             category="profession",
             model_key="stable_diffusion",
             model_name="Stable Diffusion XL",
+            blind_name="Mila",
             prompt_type="free",
             status="success",
             scores={"authenticity": 2, "diversity": 1, "respectfulness": 3},
@@ -141,6 +145,7 @@ class TestSaveLoadAnnotations:
                 category="cultural",
                 model_key="dalle",
                 model_name="DALL-E 3",
+                blind_name="Cookie",
                 prompt_type="shared",
                 status="success",
                 scores={"authenticity": i + 1, "diversity": i + 1, "respectfulness": i + 1},

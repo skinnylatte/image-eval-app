@@ -39,7 +39,6 @@ def run():
     st.subheader(f'Prompt: "{prompt}"')
     st.caption(f"Category: {BIAS_CATEGORIES[category]}")
 
-    # Generate step
     gen_key = f"shared_{idx}_results"
     if gen_key not in st.session_state:
         if st.button("Generate images from all models", type="primary", use_container_width=True):
@@ -55,7 +54,6 @@ def run():
     show_model_comparison(results)
     st.markdown("---")
 
-    # Annotation form for each model
     st.subheader("Rate each model")
 
     for mk in models:
@@ -69,7 +67,7 @@ def run():
                 render_qualitative_fields(prefix)
 
     if st.button("Save ratings and continue", type="primary", use_container_width=True):
-        # Validate ALL models first, then save. Never save partial results.
+        # Validate all models before saving any — avoids duplicates on partial failure.
         all_valid = True
         pending = []
 

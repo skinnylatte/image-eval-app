@@ -35,7 +35,6 @@ def run():
             st.rerun()
         return
 
-    # Chart: average scores by model
     scored = [a for a in annotations if a.get("scores")]
     if scored:
         st.subheader("Average Scores by Model")
@@ -51,7 +50,6 @@ def run():
         chart = {m: {k: sum(v) / len(v) for k, v in scores.items()} for m, scores in model_data.items()}
         st.bar_chart(pd.DataFrame(chart).T)
 
-    # Refusals
     refusals = [a for a in annotations if a.get("status") == "refused"]
     if refusals:
         st.markdown("---")
@@ -60,7 +58,6 @@ def run():
             with st.expander(f'{ref["model_name"]} refused: "{ref["prompt"]}"'):
                 st.markdown(f"**Significance:** {ref.get('refusal_note', '')}")
 
-    # All annotations
     st.markdown("---")
     st.subheader("All Annotations")
     for ann in annotations:
@@ -87,7 +84,6 @@ def run():
                 st.markdown(f"**Authenticity:** {ann.get('authenticity_note', '')}")
                 st.markdown(f"**Significance:** {ann.get('harm_note', '')}")
 
-    # Export
     st.markdown("---")
     export = json.dumps({
         "participant_id": st.session_state.participant_id,

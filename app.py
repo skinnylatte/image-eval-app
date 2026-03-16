@@ -1,7 +1,4 @@
-"""
-Entry point for the Red Team Image Bias Evaluation app.
-Run with: streamlit run app.py
-"""
+"""Run with: streamlit run app.py"""
 
 import streamlit as st
 from config import PHASE_WELCOME, PHASE_SHARED, PHASE_EXPLORE, PHASE_ANNOTATE, PHASE_RESULTS
@@ -11,10 +8,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
-# ---------------------------------------------------------------------------
-# Session state defaults
-# ---------------------------------------------------------------------------
 
 _DEFAULTS = {
     "participant_id": None,
@@ -31,10 +24,6 @@ for key, val in _DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
-# ---------------------------------------------------------------------------
-# Sidebar (shown when logged in)
-# ---------------------------------------------------------------------------
-
 if st.session_state.participant_id:
     from data import annotation_count
 
@@ -48,10 +37,6 @@ if st.session_state.participant_id:
         st.markdown("---")
         st.markdown("**Need a break?** That's okay. Tell your facilitator.")
 
-# ---------------------------------------------------------------------------
-# Routing
-# ---------------------------------------------------------------------------
-
 phase = st.session_state.current_phase
 
 if phase == PHASE_WELCOME:
@@ -59,7 +44,6 @@ if phase == PHASE_WELCOME:
     page.run()
 
 elif phase == PHASE_SHARED:
-    # Guard: don't let participants redo shared prompts
     if st.session_state.shared_prompts_completed:
         st.session_state.current_phase = PHASE_EXPLORE
         st.rerun()

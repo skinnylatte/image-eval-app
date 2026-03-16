@@ -1,8 +1,3 @@
-"""
-All configuration constants for the red team evaluation app.
-Edit this file to customize models, rubric, shared prompts, etc.
-"""
-
 MODELS = {
     "stable_diffusion": "Stable Diffusion XL",
     "dalle": "DALL-E 3",
@@ -68,7 +63,6 @@ PROMPT_TARGET = 8
 
 BACKGROUNDS = ["Pakistan", "Iran", "Turkey", "Egypt"]
 
-# Phase constants — import these instead of using raw strings
 PHASE_WELCOME = "welcome"
 PHASE_SHARED = "shared_prompts"
 PHASE_EXPLORE = "red_team"

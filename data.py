@@ -1,8 +1,3 @@
-"""
-Data layer: save/load annotations, manage participant identity, call image APIs.
-Single source of truth for annotation schema.
-"""
-
 import json
 import os
 import uuid
@@ -18,16 +13,12 @@ for _d in [DATA_DIR, IMAGES_DIR]:
     os.makedirs(_d, exist_ok=True)
 
 
-# ---------------------------------------------------------------------------
-# Participant identity
-# ---------------------------------------------------------------------------
-
 def generate_anonymous_id() -> str:
     return f"P-{uuid.uuid4().hex[:8]}"
 
 
 def save_identity_mapping(anonymous_id: str, real_name: str, background: str):
-    """Write one identity file per participant to avoid shared-file race conditions."""
+    """One file per participant to avoid race conditions on a shared file."""
     path = os.path.join(DATA_DIR, f"_id_{anonymous_id}.json")
     _write_json(path, {
         "anonymous_id": anonymous_id,
@@ -36,10 +27,6 @@ def save_identity_mapping(anonymous_id: str, real_name: str, background: str):
         "registered_at": datetime.now(timezone.utc).isoformat(),
     })
 
-
-# ---------------------------------------------------------------------------
-# Annotations
-# ---------------------------------------------------------------------------
 
 def build_annotation(
     *,
@@ -55,7 +42,6 @@ def build_annotation(
     authenticity_note: Optional[str] = None,
     harm_note: Optional[str] = None,
 ) -> Dict:
-    """Single place to construct an annotation record."""
     return {
         "participant_id": st.session_state.participant_id,
         "background": st.session_state.participant_background,
@@ -97,26 +83,10 @@ def load_all_annotations() -> List[Dict]:
     return annotations
 
 
-# ---------------------------------------------------------------------------
-# Image generation
-# ---------------------------------------------------------------------------
-
 def generate_images(prompt: str, model_key: str, num_images: int = 4) -> Dict:
-    """
-    Call image generation API.
-    Returns {"status": "success"|"refused"|"error", "images": [...], "message": ...}
+    """Returns {"status": "success"|"refused"|"error", "images": [...], "message": ...}.
 
-    PLACEHOLDER — replace the body of this function with actual API calls.
-
-    Example for DALL-E 3:
-        import openai
-        try:
-            resp = openai.images.generate(prompt=prompt, model="dall-e-3", n=num_images, size="1024x1024")
-            return {"status": "success", "images": [img.url for img in resp.data], "message": None}
-        except openai.BadRequestError as e:
-            if "safety" in str(e).lower():
-                return {"status": "refused", "images": [], "message": str(e)}
-            raise
+    Replace the body with actual API calls. See README.md for examples.
     """
     return {
         "status": "success",
@@ -129,7 +99,7 @@ def generate_images(prompt: str, model_key: str, num_images: int = 4) -> Dict:
 
 
 def save_image_to_disk(image_bytes: bytes, participant_id: str, prompt_idx: int, model: str, image_idx: int) -> str:
-    """Download and persist an image. Call this inside generate_images() once you wire up real APIs."""
+    """Persist an image locally. Wire into generate_images() when using real APIs."""
     participant_dir = os.path.join(IMAGES_DIR, participant_id)
     os.makedirs(participant_dir, exist_ok=True)
     filepath = os.path.join(participant_dir, f"prompt{prompt_idx}_{model}_{image_idx}.png")
@@ -137,10 +107,6 @@ def save_image_to_disk(image_bytes: bytes, participant_id: str, prompt_idx: int,
         f.write(image_bytes)
     return filepath
 
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
 
 def _annotations_path(participant_id: str) -> str:
     safe_id = participant_id.replace("/", "").replace("\\", "").replace("..", "")

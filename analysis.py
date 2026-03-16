@@ -1,8 +1,3 @@
-"""
-Analysis functions for aggregating red team data across participants.
-Generates summary statistics and identifies patterns for the paper.
-"""
-
 import numpy as np
 import pandas as pd
 from collections import defaultdict
@@ -11,15 +6,8 @@ from typing import Dict, List
 from config import SCORE_FIELDS
 
 
-# ---------------------------------------------------------------------------
-# Core aggregation (one function, parameterized)
-# ---------------------------------------------------------------------------
-
 def aggregate_scores(annotations: List[Dict], group_field: str) -> Dict:
-    """
-    Group annotations by `group_field` and compute mean/std for each score dimension.
-    `group_field` is a key in the annotation dict (e.g. "model_name", "category", "background").
-    """
+    """Group annotations by `group_field` and compute mean/std per score dimension."""
     buckets = defaultdict(lambda: {f: [] for f in SCORE_FIELDS})
 
     for ann in annotations:
@@ -46,10 +34,6 @@ def aggregate_scores(annotations: List[Dict], group_field: str) -> Dict:
     return results
 
 
-# ---------------------------------------------------------------------------
-# Refusal analysis
-# ---------------------------------------------------------------------------
-
 def analyze_refusals(annotations: List[Dict]) -> Dict:
     by_model = defaultdict(list)
     by_category = defaultdict(list)
@@ -73,15 +57,9 @@ def analyze_refusals(annotations: List[Dict]) -> Dict:
     }
 
 
-# ---------------------------------------------------------------------------
-# Inter-rater reliability
-# ---------------------------------------------------------------------------
-
 def compute_inter_rater_reliability(annotations: List[Dict]) -> Dict:
-    """
-    Per-(prompt, model) agreement stats for shared prompts.
-    For a full paper, compute Krippendorff's alpha (requires the `krippendorff` package).
-    """
+    """Per-(prompt, model) agreement stats for shared prompts.
+    For publication, use Krippendorff's alpha instead of range."""
     shared = [a for a in annotations if a.get("prompt_type") == "shared" and a.get("scores")]
 
     groups = defaultdict(lambda: {f: [] for f in SCORE_FIELDS})
@@ -114,10 +92,6 @@ def compute_inter_rater_reliability(annotations: List[Dict]) -> Dict:
     return results
 
 
-# ---------------------------------------------------------------------------
-# Key findings extraction
-# ---------------------------------------------------------------------------
-
 def extract_low_scores(annotations: List[Dict], threshold: int = 2) -> Dict[str, Dict[str, List]]:
     """Find annotations where any score dimension is at or below `threshold`."""
     findings = {f: defaultdict(list) for f in SCORE_FIELDS}
@@ -146,7 +120,6 @@ def extract_low_scores(annotations: List[Dict], threshold: int = 2) -> Dict[str,
 
 
 def extract_quotes(annotations: List[Dict], min_length: int = 50) -> List[Dict]:
-    """Collect substantive participant quotes from text fields."""
     quotes = []
     for ann in annotations:
         for field in ["harm_note", "authenticity_note", "expectation"]:
@@ -163,10 +136,6 @@ def extract_quotes(annotations: List[Dict], min_length: int = 50) -> List[Dict]:
     return quotes
 
 
-# ---------------------------------------------------------------------------
-# Summary table (for paper)
-# ---------------------------------------------------------------------------
-
 def summary_table(annotations: List[Dict]) -> pd.DataFrame:
     rows = []
     for label, field in [("By Model", "model_name"), ("By Category", "category"), ("By Background", "background")]:
@@ -178,10 +147,6 @@ def summary_table(annotations: List[Dict]) -> pd.DataFrame:
             rows.append(row)
     return pd.DataFrame(rows)
 
-
-# ---------------------------------------------------------------------------
-# Full report
-# ---------------------------------------------------------------------------
 
 def generate_report(annotations: List[Dict]) -> str:
     participants = set(a["participant_id"] for a in annotations)
@@ -202,19 +167,17 @@ def generate_report(annotations: List[Dict]) -> str:
         "\n",
     ]
 
-    # Inter-rater reliability
     irr = compute_inter_rater_reliability(annotations)
     if irr:
         lines.append("## Inter-Rater Reliability (Shared Prompts)\n")
         for key, stats in irr.items():
             lines.append(f"**{key}** (n={stats['n_raters']} raters)  ")
-            for f in SCORE_FIELDS:
-                m = stats.get(f"{f}_mean")
+            for sf in SCORE_FIELDS:
+                m = stats.get(f"{sf}_mean")
                 if isinstance(m, float):
-                    lines.append(f"  - {f.title()}: M={m:.2f}, SD={stats[f'{f}_std']:.2f}, Range={stats[f'{f}_range']}")
+                    lines.append(f"  - {sf.title()}: M={m:.2f}, SD={stats[f'{sf}_std']:.2f}, Range={stats[f'{sf}_range']}")
             lines.append("")
 
-    # Refusals
     ref = analyze_refusals(annotations)
     if ref["total"]:
         lines.append("## Model Refusals\n")
@@ -224,7 +187,6 @@ def generate_report(annotations: List[Dict]) -> str:
                 lines.append(f'  - "{e["prompt"]}" — {e["note"][:100]}')
             lines.append("")
 
-    # Low scores
     findings = extract_low_scores(annotations)
     for field in SCORE_FIELDS:
         items = findings[field]
@@ -239,7 +201,6 @@ def generate_report(annotations: List[Dict]) -> str:
                 lines.append(f'  - "{iss["prompt"]}"{bg}: {note}')
             lines.append("")
 
-    # Quotes
     quotes = extract_quotes(annotations)[:10]
     if quotes:
         lines.append("## Selected Participant Insights\n")

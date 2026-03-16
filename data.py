@@ -232,35 +232,6 @@ def _generate_qwen(prompt: str, num_images: int) -> Dict:
     return {"status": "error", "images": [], "message": "Timed out waiting for Qwen"}
 
 
-@_generator("seedream")
-def _generate_seedream(prompt: str, num_images: int) -> Dict:
-    api_key = _require_env("BYTEPLUS_API_KEY")
-    # Seedream via BytePlus ModelArk
-    api_url = "https://ark.byteplus.com/api/v3/images/generations"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    images = []
-    for _ in range(num_images):
-        payload = {
-            "model": "doubao-seedream-4.5",
-            "prompt": prompt,
-            "size": "1024x1024",
-        }
-        resp = requests.post(api_url, headers=headers, json=payload, timeout=60)
-        if resp.status_code == 200:
-            data = resp.json()
-            for img in data.get("data", []):
-                url = img.get("url")
-                if url:
-                    images.append(url)
-        elif resp.status_code == 400:
-            return {"status": "refused", "images": [], "message": resp.text[:200]}
-        else:
-            return {"status": "error", "images": [], "message": f"HTTP {resp.status_code}: {resp.text[:200]}"}
-    return {"status": "success", "images": images, "message": None}
-
 
 @_generator("hunyuan")
 def _generate_hunyuan(prompt: str, num_images: int) -> Dict:

@@ -4,7 +4,6 @@ MODELS = {
     "flux": "Flux 1.1 Pro",
     "imagen": "Google Imagen 4",
     "qwen": "Qwen-Image",
-    "seedream": "Seedream 4.5",
     "hunyuan": "Hunyuan Image 3.0",
 }
 

@@ -171,9 +171,9 @@ class TestGenerateImages:
 
     def test_missing_api_key_returns_error(self):
         for var in ["OPENAI_API_KEY", "HF_API_TOKEN", "GOOGLE_API_KEY",
-                     "DASHSCOPE_API_KEY", "BYTEPLUS_API_KEY", "REPLICATE_API_TOKEN"]:
+                     "DASHSCOPE_API_KEY", "REPLICATE_API_TOKEN"]:
             os.environ.pop(var, None)
 
-        for model_key in ["dalle", "stable_diffusion", "imagen", "qwen", "seedream"]:
+        for model_key in ["dalle", "stable_diffusion", "imagen", "qwen"]:
             result = data_mod.generate_images("A doctor", model_key, 1)
             assert result["status"] == "error", f"{model_key} should fail without API key"

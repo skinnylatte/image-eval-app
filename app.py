@@ -9,6 +9,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+st.html('<meta name="robots" content="noindex, nofollow">')
+
 _DEFAULTS = {
     "participant_id": None,
     "participant_display_name": None,

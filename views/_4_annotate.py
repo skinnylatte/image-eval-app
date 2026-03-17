@@ -10,6 +10,7 @@ from components import (
     read_scores,
     read_qualitative_fields,
     read_refusal_note,
+    is_nonsensical,
     validate_annotation,
 )
 
@@ -45,8 +46,10 @@ def run():
         show_image_grid(result)
         st.markdown("---")
         render_scoring_form(prefix)
-        st.markdown("---")
-        render_qualitative_fields(prefix)
+        current_scores = read_scores(prefix)
+        if not is_nonsensical(current_scores):
+            st.markdown("---")
+            render_qualitative_fields(prefix)
 
     st.markdown("---")
 

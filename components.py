@@ -62,15 +62,14 @@ def show_gallery(results: Dict[str, Dict]):
 
 
 def render_scoring_form(key_prefix: str):
-    """Renders radio buttons for each rubric dimension.
-    Scores stored in session_state as 0-indexed ints; use read_scores() to get 1-5 values."""
     for metric, rubric in SCORING_RUBRIC.items():
         st.markdown(f"**{rubric['question']}**")
         options = rubric["options"]
+        start = 0 if len(options) > 5 else 1
         st.radio(
             rubric["label"],
             options=range(len(options)),
-            format_func=lambda i, opts=options: f"{i + 1} — {opts[i]}",
+            format_func=lambda i, opts=options, s=start: f"{i + s} — {opts[i]}",
             index=None,
             key=f"{key_prefix}_{metric}",
             horizontal=True,
@@ -112,9 +111,13 @@ def render_refusal_field(key_prefix: str):
 
 def read_scores(key_prefix: str) -> Dict[str, Optional[int]]:
     scores = {}
-    for metric in SCORING_RUBRIC:
+    for metric, rubric in SCORING_RUBRIC.items():
         val = st.session_state.get(f"{key_prefix}_{metric}")
-        scores[metric] = (val + 1) if val is not None else None
+        if val is None:
+            scores[metric] = None
+        else:
+            start = 0 if len(rubric["options"]) > 5 else 1
+            scores[metric] = val + start
     return scores
 
 
@@ -130,7 +133,16 @@ def read_refusal_note(key_prefix: str) -> str:
     return st.session_state.get(f"{key_prefix}_refusal", "").strip()
 
 
+def is_nonsensical(scores: Dict[str, Optional[int]]) -> bool:
+    return scores.get("authenticity") == 0
+
+
 def validate_annotation(scores: Dict[str, Optional[int]], expectation: str, authenticity_note: str, harm_note: str) -> bool:
+    if scores.get("authenticity") is None:
+        st.error("Please rate Authenticity.")
+        return False
+    if is_nonsensical(scores):
+        return True
     missing = [SCORING_RUBRIC[m]["label"] for m, v in scores.items() if v is None]
     if missing:
         st.error(f"Please rate all dimensions: {', '.join(missing)}")

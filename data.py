@@ -148,16 +148,7 @@ def _generate_stable_diffusion(prompt: str, num_images: int) -> Dict:
 
 @_generator("flux")
 def _generate_flux(prompt: str, num_images: int) -> Dict:
-    import replicate as replicate_client
-    os.environ["REPLICATE_API_TOKEN"] = _require_env("REPLICATE_API_TOKEN")
-    images = []
-    for _ in range(num_images):
-        output = replicate_client.run(
-            "black-forest-labs/flux-1.1-pro",
-            input={"prompt": prompt, "aspect_ratio": "1:1"},
-        )
-        images.extend(_extract_replicate_urls(output))
-    return {"status": "success", "images": images, "message": None}
+    return _run_replicate("black-forest-labs/flux-1.1-pro", {"prompt": prompt, "aspect_ratio": "1:1"}, num_images)
 
 
 @_generator("imagen")
@@ -211,15 +202,26 @@ def _generate_qwen(prompt: str, num_images: int) -> Dict:
 
 @_generator("hunyuan")
 def _generate_hunyuan(prompt: str, num_images: int) -> Dict:
+    return _run_replicate("tencent/hunyuan-image-3", {"prompt": prompt, "width": 1024, "height": 1024}, num_images)
+
+
+def _run_replicate(model_id: str, inputs: dict, num_images: int) -> Dict:
     import replicate as replicate_client
     os.environ["REPLICATE_API_TOKEN"] = _require_env("REPLICATE_API_TOKEN")
     images = []
-    for _ in range(num_images):
-        output = replicate_client.run(
-            "tencent/hunyuan-image-3",
-            input={"prompt": prompt, "width": 1024, "height": 1024},
-        )
-        images.extend(_extract_replicate_urls(output))
+    for i in range(num_images):
+        for attempt in range(5):
+            try:
+                output = replicate_client.run(model_id, input=inputs)
+                images.extend(_extract_replicate_urls(output))
+                break
+            except Exception as e:
+                if "429" in str(e) or "throttled" in str(e).lower():
+                    time.sleep(12)
+                else:
+                    raise
+        else:
+            return {"status": "error", "images": images, "message": "Rate limited after retries"}
     return {"status": "success", "images": images, "message": None}
 
 

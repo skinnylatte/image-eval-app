@@ -1,0 +1,10 @@
+.git
+.env
+.venv
+.pytest_cache
+__pycache__
+red_team_data
+tests
+*.md
+.DS_Store
+.dockerignore

@@ -47,11 +47,12 @@ def run():
             name = _display_name(ann)
             if name not in model_data:
                 model_data[name] = {"Authenticity": [], "Diversity": [], "Respectfulness": []}
-            model_data[name]["Authenticity"].append(ann["scores"]["authenticity"])
-            model_data[name]["Diversity"].append(ann["scores"]["diversity"])
-            model_data[name]["Respectfulness"].append(ann["scores"]["respectfulness"])
+            for key, field in [("Authenticity", "authenticity"), ("Diversity", "diversity"), ("Respectfulness", "respectfulness")]:
+                val = ann["scores"].get(field)
+                if val is not None:
+                    model_data[name][key].append(val)
 
-        chart = {m: {k: sum(v) / len(v) for k, v in scores.items()} for m, scores in model_data.items()}
+        chart = {m: {k: sum(v) / len(v) for k, v in scores.items() if v} for m, scores in model_data.items()}
         st.bar_chart(pd.DataFrame(chart).T)
 
     refusals = [a for a in annotations if a.get("status") == "refused"]
@@ -80,12 +81,11 @@ def run():
             else:
                 scores = ann.get("scores", {})
                 cols = st.columns(3)
-                with cols[0]:
-                    st.metric("Authenticity", f"{scores.get('authenticity', '?')}/5")
-                with cols[1]:
-                    st.metric("Diversity", f"{scores.get('diversity', '?')}/5")
-                with cols[2]:
-                    st.metric("Respectfulness", f"{scores.get('respectfulness', '?')}/5")
+                for col, label, field in zip(cols, ["Authenticity", "Diversity", "Respectfulness"],
+                                             ["authenticity", "diversity", "respectfulness"]):
+                    with col:
+                        val = scores.get(field)
+                        st.metric(label, f"{val}/5" if val is not None else "N/A")
                 st.markdown(f"**Expected vs. Actual:** {ann.get('expectation', '')}")
                 st.markdown(f"**Authenticity:** {ann.get('authenticity_note', '')}")
                 st.markdown(f"**Significance:** {ann.get('harm_note', '')}")

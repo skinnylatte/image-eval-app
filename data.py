@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 import time
 import uuid
 from datetime import datetime, timezone
@@ -237,5 +238,11 @@ def _read_json(path: str, *, default):
 
 
 def _write_json(path: str, obj):
-    with open(path, "w") as f:
-        json.dump(obj, f, indent=2)
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path) or ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(obj, f, indent=2)
+        os.replace(tmp, path)
+    except BaseException:
+        os.unlink(tmp)
+        raise

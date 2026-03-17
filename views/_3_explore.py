@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 
 import streamlit as st
 
-from config import BIAS_CATEGORIES, MODELS, PROMPT_TARGET, PHASE_GALLERY, PHASE_RESULTS
+from config import BIAS_CATEGORIES, BLIND_NAMES, MODELS, PROMPT_TARGET, PHASE_GALLERY, PHASE_RESULTS
 from data import annotation_count, get_participant_models
-from components import generate_with_progress
+from components import generate_with_progress, show_image_grid
 
 
 def run():
@@ -76,11 +76,28 @@ def run():
             st.rerun()
 
     prompts = st.session_state.get("prompts", [])
+    generated = st.session_state.get("generated_images", {})
     if prompts:
         st.markdown("---")
         st.subheader("Previous prompts")
-        for p in reversed(prompts):
-            st.markdown(f"- **{BIAS_CATEGORIES.get(p['category'], p['category'])}:** {p['prompt']}")
+        for i, p in enumerate(reversed(prompts)):
+            prompt_idx = len(prompts) - 1 - i
+            cat = BIAS_CATEGORIES.get(p["category"], p["category"])
+            with st.expander(f"**{cat}:** {p['prompt']}"):
+                model_results = {
+                    mk: entry["result"]
+                    for key, entry in generated.items()
+                    if entry.get("prompt_idx") == prompt_idx
+                    for mk in [entry["model"]]
+                }
+                if model_results:
+                    cols = st.columns(min(len(model_results), 2))
+                    for col, (mk, result) in zip(cols * len(model_results), model_results.items()):
+                        with col:
+                            st.markdown(f"**{BLIND_NAMES.get(mk, mk)}**")
+                            show_image_grid(result, max_per_row=2)
+                else:
+                    st.caption("Images no longer available")
 
     st.markdown("---")
     if st.button("Continue to Results"):

@@ -34,7 +34,7 @@ def run():
 
     if not annotations:
         st.info("Complete some annotations to see your results here.")
-        if st.button("Back to exploration"):
+        if st.button("Write a new prompt"):
             st.session_state.current_phase = PHASE_EXPLORE
             st.rerun()
         return
@@ -105,7 +105,7 @@ def run():
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Back to exploration"):
+        if st.button("Write a new prompt"):
             st.session_state.current_phase = PHASE_EXPLORE
             st.rerun()
     with col2:

@@ -61,7 +61,7 @@ def run():
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Back to exploration", use_container_width=True):
+        if st.button("Write a new prompt", use_container_width=True):
             st.session_state.pop("gallery_order", None)
             st.session_state.current_phase = PHASE_EXPLORE
             st.rerun()

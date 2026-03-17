@@ -34,7 +34,7 @@ def run():
     )
     custom_prompt = st.text_area(
         "Your prompt:",
-        placeholder="E.g., 'A successful Pakistani businesswoman giving a keynote speech'",
+        placeholder="E.g., 'A family celebrating a holiday together'",
         height=100,
     )
     num_images = st.slider("Images per system", 1, 4, 2)

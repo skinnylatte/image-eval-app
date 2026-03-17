@@ -70,7 +70,7 @@ SHARED_PROMPTS = [
 
 PROMPT_TARGET = 8
 
-BACKGROUNDS = ["Pakistan", "Iran", "Turkey", "Egypt"]
+BACKGROUNDS = []
 
 
 import os

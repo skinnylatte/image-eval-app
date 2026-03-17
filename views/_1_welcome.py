@@ -6,12 +6,12 @@ from data import generate_anonymous_id, save_identity_mapping
 def run():
     st.title("Red Team Image Bias Evaluation")
     st.markdown(
-        "This is a participatory red teaming tool for evaluating bias in AI image generation systems. "
-        "Participants from underrepresented communities test how these systems represent their cultures, "
-        "identities, and lived experiences."
+        "A participatory red teaming tool that lets anyone run a workshop where people from different "
+        "communities can test and evaluate how AI image generation systems represent — or fail to "
+        "represent — them, and surface the real-world harms that bias in these systems creates."
     )
     st.markdown(
-        "To run your own workshop, see the "
+        "Want to run your own workshop? See the "
         "[setup instructions on GitHub](https://github.com/skinnylatte/image-eval-app)."
     )
     st.markdown("---")
@@ -78,11 +78,16 @@ def run():
     with col1:
         name = st.text_input("Your name (stored securely, not linked to your ratings)")
     with col2:
-        options = [""] + BACKGROUNDS + ["Other"]
-        background = st.selectbox("Your background / community", options, index=0)
-
-    if background == "Other":
-        background = st.text_input("Please describe your background / community")
+        if BACKGROUNDS:
+            options = [""] + BACKGROUNDS + ["Other"]
+            background = st.selectbox("Your background / community", options, index=0)
+            if background == "Other":
+                background = st.text_input("Please describe your background / community")
+        else:
+            background = st.text_input(
+                "Your background / community",
+                placeholder="E.g., Pakistani, Black British, Deaf community, LGBTQ+",
+            )
 
     st.markdown("---")
     st.markdown("""

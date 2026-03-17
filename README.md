@@ -1,12 +1,10 @@
-# Participatory Red Team Evaluation of Image Diffusion Models
+# Red Team Image Bias Evaluation
 
-A web app for running participatory red teaming workshops that evaluate bias in AI image generation systems.
-
-Participants use their lived experience to test how AI image systems represent their communities, rate outputs on authenticity, diversity, and respectfulness, and explain the real-world significance of any bias they find.
+A participatory red teaming tool that lets anyone run a workshop where people from different communities can test and evaluate how AI image generation systems represent — or fail to represent — them, and surface the real-world harms that bias in these systems creates.
 
 ## What this is
 
-This tool supports a 3-hour in-person workshop where 12-18 participants from underrepresented communities collectively evaluate image generation models for bias. It captures both quantitative scores and qualitative observations, producing data suitable for academic publication.
+A workshop-in-a-box for evaluating bias in AI image generation. A facilitator brings together 12-18 participants from any community, and participants use their lived experience to probe how current systems depict their cultures, identities, and daily lives. The app captures both quantitative scores and qualitative written observations, producing data suitable for academic publication.
 
 ### Systems under test
 

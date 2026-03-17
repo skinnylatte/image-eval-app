@@ -30,6 +30,7 @@ def run():
     result = results.get(mk, {})
     refused = result.get("status") == "refused"
     prompt_text = prompt_meta.get("prompt", "")
+    prompt_type = prompt_meta.get("prompt_type", "free")
 
     st.title(f"Tell us about {blind_name}")
     st.progress(idx / len(text_queue), text=f"System {idx + 1} of {len(text_queue)}")
@@ -46,7 +47,7 @@ def run():
         st.markdown("**Score this system:**")
         render_scoring_form(prefix)
         st.markdown("---")
-        render_qualitative_fields(prefix)
+        render_qualitative_fields(prefix, prompt_type)
 
     st.markdown("---")
     col1, col2 = st.columns([1, 2])
@@ -71,8 +72,8 @@ def run():
                 scores = read_scores(prefix)
                 if not validate_scores_only(scores):
                     return
-                exp, auth, harm = read_qualitative_fields(prefix)
-                if not validate_text_fields(exp, auth, harm):
+                exp, auth, harm = read_qualitative_fields(prefix, prompt_type)
+                if not validate_text_fields(exp, auth, harm, prompt_type):
                     return
                 st.session_state.scored_models[mk] = {"status": "success", "scores": scores}
                 st.session_state.setdefault("text_responses", {})[mk] = {

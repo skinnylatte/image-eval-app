@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import tempfile
 import time
@@ -10,8 +11,26 @@ import openai
 import requests
 import streamlit as st
 
+log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+
 DATA_DIR = "red_team_data"
 os.makedirs(DATA_DIR, exist_ok=True)
+
+
+def _retry(fn, max_attempts=3, base_delay=2):
+    """Retry with exponential backoff on transient errors."""
+    for attempt in range(max_attempts):
+        try:
+            return fn()
+        except Exception as e:
+            err = str(e).lower()
+            transient = any(s in err for s in ("429", "500", "502", "503", "timeout", "throttle", "rate"))
+            if not transient or attempt == max_attempts - 1:
+                raise
+            delay = base_delay * (2 ** attempt)
+            log.warning("Retry %d/%d for %s after %ds: %s", attempt + 1, max_attempts, fn, delay, e)
+            time.sleep(delay)
 
 
 def generate_anonymous_id() -> str:
@@ -32,6 +51,7 @@ def save_identity_mapping(anonymous_id: str, real_name: str, background: str):
         "background": background,
         "registered_at": datetime.now(timezone.utc).isoformat(),
     })
+    log.info("Registered participant %s (%s)", anonymous_id, background)
 
 
 def build_annotation(
@@ -73,6 +93,8 @@ def save_annotation(annotation: Dict):
     existing = _read_json(path, default=[])
     existing.append(annotation)
     _write_json(path, existing)
+    log.info("Saved annotation: participant=%s model=%s prompt=%.40s",
+             annotation.get("participant_id"), annotation.get("model"), annotation.get("prompt"))
 
 
 def load_annotations(participant_id: str) -> List[Dict]:
@@ -98,9 +120,13 @@ def generate_images(prompt: str, model_key: str, num_images: int = 4) -> Dict:
     gen = _GENERATORS.get(model_key)
     if not gen:
         return {"status": "error", "images": [], "message": f"Unknown model: {model_key}"}
+    log.info("Generating %d images from %s: %.60s", num_images, model_key, prompt)
     try:
-        return gen(prompt, num_images)
+        result = gen(prompt, num_images)
+        log.info("Result from %s: status=%s images=%d", model_key, result["status"], len(result.get("images", [])))
+        return result
     except Exception as e:
+        log.exception("Generator %s failed", model_key)
         return {"status": "error", "images": [], "message": str(e)}
 
 
@@ -117,7 +143,7 @@ def _generate_dalle(prompt: str, num_images: int) -> Dict:
     images = []
     for _ in range(num_images):
         try:
-            resp = client.images.generate(prompt=prompt, model="dall-e-3", n=1, size="1024x1024")
+            resp = _retry(lambda: client.images.generate(prompt=prompt, model="dall-e-3", n=1, size="1024x1024"))
             images.append(resp.data[0].url)
         except openai.BadRequestError as e:
             if "safety" in str(e).lower() or "policy" in str(e).lower():
@@ -138,11 +164,11 @@ def _generate_imagen(prompt: str, num_images: int) -> Dict:
     from google.genai import types
 
     client = genai.Client(api_key=_require_env("GOOGLE_API_KEY"))
-    resp = client.models.generate_images(
+    resp = _retry(lambda: client.models.generate_images(
         model="imagen-4.0-generate-001",
         prompt=prompt,
         config=types.GenerateImagesConfig(number_of_images=min(num_images, 4)),
-    )
+    ))
     if not resp.generated_images:
         return {"status": "refused", "images": [], "message": "No images returned"}
 
@@ -155,11 +181,16 @@ def _generate_qwen(prompt: str, num_images: int) -> Dict:
     base = "https://dashscope-intl.aliyuncs.com/api/v1"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", "X-DashScope-Async": "enable"}
 
-    resp = requests.post(f"{base}/services/aigc/text2image/image-synthesis", headers=headers, json={
-        "model": "wanx-v1",
-        "input": {"prompt": prompt},
-        "parameters": {"n": min(num_images, 4), "size": "1024*1024"},
-    }, timeout=30)
+    def _submit():
+        r = requests.post(f"{base}/services/aigc/text2image/image-synthesis", headers=headers, json={
+            "model": "wanx-v1",
+            "input": {"prompt": prompt},
+            "parameters": {"n": min(num_images, 4), "size": "1024*1024"},
+        }, timeout=30)
+        r.raise_for_status()
+        return r
+
+    resp = _retry(_submit)
     if resp.status_code != 200:
         return {"status": "error", "images": [], "message": f"HTTP {resp.status_code}: {resp.text[:200]}"}
 

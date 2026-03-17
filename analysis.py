@@ -184,7 +184,7 @@ def generate_report(annotations: List[Dict]) -> str:
         for model, entries in ref["by_model"].items():
             lines.append(f"**{model}:** {len(entries)} refusals  ")
             for e in entries[:3]:
-                lines.append(f'  - "{e["prompt"]}" — {e["note"][:100]}')
+                lines.append(f'  - "{e["prompt"]}" -{e["note"][:100]}')
             lines.append("")
 
     findings = extract_low_scores(annotations)
@@ -206,7 +206,7 @@ def generate_report(annotations: List[Dict]) -> str:
         lines.append("## Selected Participant Insights\n")
         for i, q in enumerate(quotes, 1):
             bg = f" [{q['background']}]" if q.get("background") else ""
-            lines.append(f'### {i}. {q["model"]} — "{q["prompt"]}"{bg}\n')
+            lines.append(f'### {i}. {q["model"]} -"{q["prompt"]}"{bg}\n')
             lines.append(f"> {q['quote']}\n")
 
     return "\n".join(lines)

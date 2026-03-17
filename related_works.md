@@ -5,14 +5,14 @@
 ### [Dark and Bright Side of Participatory Red-Teaming with Targets of Stereotyping](https://arxiv.org/abs/2602.19124) (CHI 2026, very recent)
 - Empirical study of participatory red-teaming with people targeted by stereotypes
 - Key finding: Participants transformed discrimination into expertise for identifying biases
-- **Critical caveat:** Single 45-min session caused psychological harm—weakened critical thinking, internalized new stereotypes
+- **Critical caveat:** Single 45-min session caused psychological harm-weakened critical thinking, internalized new stereotypes
 - Implications: Your workshops need careful design around psychological safety, debriefing, and duration
 - Suggests need for participant support/debriefing protocols
 
 ### [AI red-teaming is a sociotechnical problem: on values, labor, and harms](https://arxiv.org/abs/2412.09751)
 - Frames red-teaming as labor, not just methodology
 - Raises questions about: Who performs red-teaming? What are the labor conditions? What are the ethical implications?
-- Directly relevant to your design—how will you structure participation to be ethical?
+- Directly relevant to your design-how will you structure participation to be ethical?
 
 ### [Ask What Your Country Can Do For You: Towards a Public Red Teaming Model](https://arxiv.org/abs/2510.20061)
 - Proposes public, jurisdiction-based red teaming (open to all residents 18+)
@@ -88,17 +88,17 @@
 
 Based on this review, **your unique angle is:**
 
-1. **Image-specific + cross-cultural participatory approach** — Most bias eval in image generation is either:
+1. **Image-specific + cross-cultural participatory approach** - Most bias eval in image generation is either:
    - Automated metrics (misses lived experience)
    - Ad-hoc audits (not systematic or rigorous)
    - LLM red-teaming (not images)
    - Single-culture datasets
 
-2. **Ethical design around psychological safety** — The CHI 2026 paper flagged harms; you could design around this (longer engagement, better debriefing, support structures)
+2. **Ethical design around psychological safety** - The CHI 2026 paper flagged harms; you could design around this (longer engagement, better debriefing, support structures)
 
-3. **Experiential vs. technical bias framing** — Your paper could argue: "Bias isn't just statistical skew; it's how marginalized communities experience the system"
+3. **Experiential vs. technical bias framing** - Your paper could argue: "Bias isn't just statistical skew; it's how marginalized communities experience the system"
 
-4. **Cross-regional findings** — Pakistan + Iran + Turkey perspectives on representation in Western-trained models (fills the gap in current "US-centric bias research")
+4. **Cross-regional findings** - Pakistan + Iran + Turkey perspectives on representation in Western-trained models (fills the gap in current "US-centric bias research")
 
 ---
 
@@ -109,7 +109,7 @@ Based on this literature:
 - **Psychological safety is critical.** Don't run single, intense sessions. Build in debriefing, ongoing support.
 - **Frame it as collaborative expertise, not exploitation.** Compensate well, give participants co-authorship options, make the work visible.
 - **Test multiple systems.** Compare how bias manifests differently across DALL-E, Stable Diffusion, Midjourney.
-- **Go beyond gender/race.** Disability, age, class, religion—what's missing?
+- **Go beyond gender/race.** Disability, age, class, religion-what's missing?
 - **Localize bias definitions.** What counts as "stereotyped" varies by culture and community.
 - **Document the process transparently.** The sociotechnical aspects (who participated, how they were recruited, what labor was involved) is as important as the findings.
 

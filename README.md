@@ -1,6 +1,12 @@
 # Red Team Image Bias Evaluation
 
-A participatory red teaming tool that lets anyone run a workshop where people from different communities can test and evaluate how AI image generation systems represent — or fail to represent — them, and surface the real-world harms that bias in these systems creates.
+A participatory red teaming tool that lets anyone run a workshop where people from different communities can test and evaluate how AI image generation systems represent - or fail to represent - them, and surface the real-world harms that bias in these systems creates.
+
+## Background
+
+This tool grows out of work on [Humane Intelligence's](https://humane-intelligence.org/) public red teaming exercises and the [IMDA Singapore AI Safety Red Teaming Challenge](https://airedteaming.sg/). Those projects demonstrated the value of participatory red teaming - bringing affected communities into the evaluation process - but were focused on text-based LLMs, ran as one-off events, and used proprietary platforms.
+
+This app fills the gap: an open-source, self-hostable tool purpose-built for **image generation** bias, designed to be reused by any facilitator with any community.
 
 ## What this is
 
@@ -270,3 +276,7 @@ python -m pytest tests/ -v
 ## License
 
 MIT
+
+---
+
+A project of [Future Ethics](https://futureethics.ai).

@@ -7,8 +7,8 @@ def run():
     st.title("Red Team Image Bias Evaluation")
     st.markdown(
         "A participatory red teaming tool that lets anyone run a workshop where people from different "
-        "communities can test and evaluate how AI image generation systems represent — or fail to "
-        "represent — them, and surface the real-world harms that bias in these systems creates."
+        "communities can test and evaluate how AI image generation systems represent - or fail to "
+        "represent - them, and surface the real-world harms that bias in these systems creates."
     )
     st.markdown(
         "Want to run your own workshop? See the "
@@ -59,10 +59,10 @@ def run():
         st.markdown("""
         ## How it works (3 hours)
 
-        1. **Orientation** (30 min) — You're here now
-        2. **Shared prompts** (15 min) — Everyone rates the same 5 prompts (for comparison)
-        3. **Free exploration** (75 min) — You write your own prompts and judge the outputs
-        4. **Group discussion** (60 min) — We identify patterns together
+        1. **Orientation** (30 min) - You're here now
+        2. **Shared prompts** (15 min) - Everyone rates the same 5 prompts (for comparison)
+        3. **Free exploration** (75 min) - You write your own prompts and judge the outputs
+        4. **Group discussion** (60 min) - We identify patterns together
 
         ### What you'll do
         - Write test prompts for the image systems
@@ -95,9 +95,9 @@ def run():
 
     By checking the box below, you agree to the following:
     - Your ratings and written responses will be used in academic research
-    - Your identity will be anonymized — your name is stored separately from your data
+    - Your identity will be anonymized - your name is stored separately from your data
     - You can withdraw at any time by telling the facilitator
-    - Generated images may contain stereotypical or offensive content — this is what we're testing
+    - Generated images may contain stereotypical or offensive content - this is what we're testing
     - If you feel uncomfortable at any point, you can take a break or stop
     """)
 

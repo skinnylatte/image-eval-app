@@ -86,7 +86,7 @@ if phase != PHASE_WELCOME and not _is_facilitator and st.session_state.participa
         if count == 0:
             st.markdown("*Your perspective as an expert matters.*")
         elif count < 10:
-            st.markdown("*Great start — keep going!*")
+            st.markdown("*Great start - keep going!*")
         else:
             st.markdown("*Amazing work. You're making a real difference.*")
 
@@ -126,3 +126,6 @@ else:
     st.error(f"Unknown phase: {phase}")
     st.session_state.current_phase = PHASE_WELCOME
     st.rerun()
+
+st.markdown("---")
+st.caption("A project of [Future Ethics](https://futureethics.ai)")

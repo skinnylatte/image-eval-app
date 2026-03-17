@@ -22,14 +22,14 @@ def generate_with_progress(prompt: str, model_keys: List[str], num_images: int =
             result = results[mk]
             if result["status"] == "success":
                 n = len(result["images"])
-                st.write(f"**{name}** — {n} image{'s' if n != 1 else ''} generated")
+                st.write(f"**{name}** - {n} image{'s' if n != 1 else ''} generated")
             elif result["status"] == "refused":
-                st.write(f"**{name}** — refused to generate")
+                st.write(f"**{name}** - refused to generate")
             else:
                 msg = result.get("message", "")[:80]
-                st.write(f"**{name}** — error: {msg}")
+                st.write(f"**{name}** - error: {msg}")
 
-        status.update(label=f"Done — {total} systems complete", state="complete", expanded=False)
+        status.update(label=f"Done - {total} systems complete", state="complete", expanded=False)
     return results
 
 
@@ -52,14 +52,14 @@ def show_image_grid(result: Dict, max_per_row: int = 4):
 
 
 def render_compact_scores(key_prefix: str):
-    """Render just the score radio buttons — no text fields."""
+    """Render just the score radio buttons -no text fields."""
     auth_rubric = SCORING_RUBRIC["authenticity"]
     auth_options = auth_rubric["options"]
     st.markdown(f"**{auth_rubric['question']}**")
     st.radio(
         auth_rubric["label"],
         options=range(len(auth_options)),
-        format_func=lambda i, opts=auth_options: f"{i} — {opts[i]}",
+        format_func=lambda i, opts=auth_options: f"{i} -{opts[i]}",
         index=None,
         key=f"{key_prefix}_authenticity",
         horizontal=True,
@@ -76,7 +76,7 @@ def render_compact_scores(key_prefix: str):
         st.radio(
             rubric["label"],
             options=range(len(options)),
-            format_func=lambda i, opts=options: f"{i + 1} — {opts[i]}",
+            format_func=lambda i, opts=options: f"{i + 1} -{opts[i]}",
             index=None,
             key=f"{key_prefix}_{metric}",
             horizontal=True,
@@ -91,7 +91,7 @@ def render_scoring_form(key_prefix: str):
         st.radio(
             rubric["label"],
             options=range(len(options)),
-            format_func=lambda i, opts=options, s=start: f"{i + s} — {opts[i]}",
+            format_func=lambda i, opts=options, s=start: f"{i + s} -{opts[i]}",
             index=None,
             key=f"{key_prefix}_{metric}",
             horizontal=True,

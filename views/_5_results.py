@@ -70,7 +70,7 @@ def run():
         name = _display_name(ann)
         ptype = "[Shared]" if ann.get("prompt_type") == "shared" else "[Free]"
         refused = ann.get("status") == "refused"
-        label = f'{ptype} {name} — "{ann["prompt"][:50]}"'
+        label = f'{ptype} {name} -"{ann["prompt"][:50]}"'
         if refused:
             label += " (refused)"
 

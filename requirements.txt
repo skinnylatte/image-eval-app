@@ -1,7 +1,7 @@
-streamlit>=1.28.0
-pandas>=2.0.0
-numpy>=1.24.0
-openai>=1.0.0
-requests>=2.31.0
-replicate>=0.25.0
+streamlit==1.55.0
+pandas==2.3.3
+numpy==2.4.3
+openai==2.28.0
+requests==2.32.5
+replicate==1.0.7
 google-genai>=1.0.0

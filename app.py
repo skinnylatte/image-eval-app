@@ -53,7 +53,7 @@ if not _is_facilitator:
         st.session_state.current_phase = PHASE_EXPLORE
         _redirected = True
 
-    elif st.session_state.current_phase == PHASE_ANNOTATE and not st.session_state.scored_models:
+    elif st.session_state.current_phase == PHASE_ANNOTATE and not st.session_state.scored_models and not st.session_state.text_queue:
         st.session_state.current_phase = PHASE_EXPLORE
         _redirected = True
 

@@ -34,7 +34,10 @@ def run():
 
     st.title(f"Tell us about {blind_name}")
     st.progress(idx / len(text_queue), text=f"System {idx + 1} of {len(text_queue)}")
-    st.caption(f'Prompt: "{prompt_text}"')
+    if refused:
+        st.info(f"This system refused to generate images for: \"{prompt_text}\"")
+    else:
+        st.info(f"You marked this system as problematic for: \"{prompt_text}\"")
     st.markdown("---")
 
     prefix = f"deepdive_{idx}_{mk}"
@@ -52,7 +55,7 @@ def run():
     st.markdown("---")
     col1, col2 = st.columns([1, 2])
     with col1:
-        if st.button("Back to triage"):
+        if st.button("Change my triage answers"):
             st.session_state.current_phase = PHASE_GALLERY
             st.rerun()
     with col2:

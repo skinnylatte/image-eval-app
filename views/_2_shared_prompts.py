@@ -30,7 +30,8 @@ def run():
     st.subheader(f'Prompt: "{prompt}"')
     st.caption(f"Category: {BIAS_CATEGORIES[category]}")
 
-    if st.button("Generate images from your systems", type="primary", use_container_width=True):
+    st.caption("This will take 10-30 seconds. You'll then compare the results from all 4 systems.")
+    if st.button("Generate images", type="primary", use_container_width=True):
         results = generate_with_progress(prompt, models)
 
         st.session_state.current_prompt_results = results

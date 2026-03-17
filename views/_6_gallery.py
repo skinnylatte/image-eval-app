@@ -23,12 +23,17 @@ def run():
     ratable = [mk for mk in display_order if results.get(mk, {}).get("status") in ("success", "refused")]
     errored = [mk for mk in display_order if results.get(mk, {}).get("status") not in ("success", "refused")]
 
+    prompt_type = prompt_meta.get("prompt_type", "free")
+    shared_idx = prompt_meta.get("shared_prompt_idx")
+
     st.title("Compare and Triage")
+    if prompt_type == "shared" and shared_idx is not None:
+        st.caption(f"Shared prompt {shared_idx + 1} of 5")
     st.subheader(f'"{prompt_text}"')
     if category:
         st.caption(f"Category: {BIAS_CATEGORIES.get(category, category)}")
     st.markdown("For each system, choose: **Looks fine**, **Problematic**, or **Nonsensical**. "
-                "You'll write detailed responses only for the problematic ones.")
+                "You'll write detailed feedback only for the problematic ones.")
     st.markdown("---")
 
     per_row = 2
@@ -59,16 +64,22 @@ def run():
         msg = results[mk].get("message", "Unknown error")[:100]
         st.error(f"**{BLIND_NAMES[mk]}** failed: {msg}")
 
-    col1, col2 = st.columns(2)
-    with col1:
+    if not ratable:
+        st.warning("No systems produced results to rate.")
         if st.button("Write a new prompt", use_container_width=True):
             st.session_state.pop("gallery_order", None)
             st.session_state.current_phase = PHASE_EXPLORE
             st.rerun()
-    with col2:
-        if not ratable:
-            st.warning("No systems produced results to rate.")
-        elif st.button("Continue", type="primary", use_container_width=True):
+    else:
+        col1, col2 = st.columns(2)
+        with col1:
+            if prompt_type != "shared":
+                if st.button("Skip this prompt", use_container_width=True):
+                    st.session_state.pop("gallery_order", None)
+                    st.session_state.current_phase = PHASE_EXPLORE
+                    st.rerun()
+        with col2:
+            if st.button("Save and continue", type="primary", use_container_width=True):
             triage = {}
             all_triaged = True
             for mk in ratable:

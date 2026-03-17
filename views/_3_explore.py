@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 
 import streamlit as st
 
-from config import BIAS_CATEGORIES, BLIND_NAMES, MODELS, PROMPT_TARGET, PHASE_GALLERY, PHASE_RESULTS
-from data import annotation_count, get_participant_models
+from config import BIAS_CATEGORIES, BLIND_NAMES, MODELS, PHASE_GALLERY
+from data import get_participant_models
 from components import generate_with_progress, show_image_grid
 
 
@@ -14,10 +14,6 @@ def run():
         f"({st.session_state.participant_background})"
     )
 
-    num_prompts = len(st.session_state.get("prompts", []))
-    count = annotation_count()
-    pct = min(num_prompts / PROMPT_TARGET, 1.0)
-    st.progress(pct, text=f"Prompts: {num_prompts} / {PROMPT_TARGET} target | Annotations: {count} total")
     st.markdown("---")
 
     st.subheader("Write a test prompt")
@@ -99,7 +95,3 @@ def run():
                 else:
                     st.caption("Images no longer available")
 
-    st.markdown("---")
-    if st.button("Continue to Results"):
-        st.session_state.current_phase = PHASE_RESULTS
-        st.rerun()

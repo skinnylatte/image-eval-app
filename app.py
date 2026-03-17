@@ -90,22 +90,22 @@ if phase != PHASE_WELCOME and not _is_facilitator and st.session_state.participa
         else:
             st.markdown("*Amazing work. You're making a real difference.*")
 
-        # Navigation
-        st.markdown("---")
-        if not shared_done:
-            if st.button("Continue shared prompts", use_container_width=True,
-                         disabled=(phase == PHASE_SHARED), type="primary"):
-                st.session_state.current_phase = PHASE_SHARED
-                st.rerun()
-        if st.button("Write a new prompt", use_container_width=True,
-                     disabled=(phase in (PHASE_EXPLORE, PHASE_GALLERY, PHASE_ANNOTATE)),
-                     type="primary" if shared_done else "secondary"):
-            st.session_state.current_phase = PHASE_EXPLORE
-            st.rerun()
-        if st.button("View my ratings", use_container_width=True,
-                     disabled=(phase == PHASE_RESULTS)):
-            st.session_state.current_phase = PHASE_RESULTS
-            st.rerun()
+        # Navigation - hide during rating flow (gallery/annotate)
+        if phase not in (PHASE_GALLERY, PHASE_ANNOTATE):
+            st.markdown("---")
+            if not shared_done and phase != PHASE_SHARED:
+                if st.button("Continue shared prompts", use_container_width=True, type="primary"):
+                    st.session_state.current_phase = PHASE_SHARED
+                    st.rerun()
+            if phase != PHASE_EXPLORE:
+                if st.button("Write a new prompt", use_container_width=True,
+                             type="primary" if shared_done else "secondary"):
+                    st.session_state.current_phase = PHASE_EXPLORE
+                    st.rerun()
+            if phase != PHASE_RESULTS:
+                if st.button("View my ratings", use_container_width=True):
+                    st.session_state.current_phase = PHASE_RESULTS
+                    st.rerun()
 
 _PAGES = {
     PHASE_WELCOME: "_1_welcome",

@@ -14,10 +14,8 @@ _tmpdir = tempfile.mkdtemp()
 with mock.patch.dict(os.environ, {}):
     import data as data_mod
 
-    # Override paths to use temp directory
+    # Override path to use temp directory
     data_mod.DATA_DIR = _tmpdir
-    data_mod.IMAGES_DIR = os.path.join(_tmpdir, "images")
-    os.makedirs(data_mod.IMAGES_DIR, exist_ok=True)
 
 
 def _mock_session_state(**kwargs):
@@ -160,13 +158,6 @@ class TestSaveLoadAnnotations:
         loaded = data_mod.load_annotations("P-nope")
         assert loaded == []
 
-
-class TestSaveImageToDisk:
-    def test_writes_file(self):
-        path = data_mod.save_image_to_disk(b"fake-png-bytes", "P-img1", 0, "dalle", 0)
-        assert os.path.exists(path)
-        with open(path, "rb") as f:
-            assert f.read() == b"fake-png-bytes"
 
 
 class TestGenerateImages:

@@ -50,24 +50,6 @@ def show_image_grid(result: Dict, max_per_row: int = 4):
                     st.error(f"Could not load image {i + 1}: {e}")
 
 
-def render_model_card(mk: str, result: Dict, key_prefix: str):
-    """Render a model's images + compact inline scores."""
-    name = BLIND_NAMES[mk]
-    st.markdown(f"### {name}")
-
-    if result.get("status") == "refused":
-        st.warning("Refused to generate.")
-        render_refusal_field(key_prefix)
-        return
-
-    if result.get("status") == "error":
-        msg = result.get("message", "Unknown error")[:100]
-        st.error(f"Error: {msg}")
-        return
-
-    show_image_grid(result, max_per_row=2)
-    render_compact_scores(key_prefix)
-
 
 def render_compact_scores(key_prefix: str):
     """Render just the score radio buttons — no text fields."""

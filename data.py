@@ -10,10 +10,7 @@ import requests
 import streamlit as st
 
 DATA_DIR = "red_team_data"
-IMAGES_DIR = os.path.join(DATA_DIR, "images")
-
-for _d in [DATA_DIR, IMAGES_DIR]:
-    os.makedirs(_d, exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
 def generate_anonymous_id() -> str:
@@ -103,13 +100,6 @@ def load_annotations(participant_id: str) -> List[Dict]:
 def annotation_count() -> int:
     return len(load_annotations(st.session_state.participant_id))
 
-
-def load_all_annotations() -> List[Dict]:
-    annotations = []
-    for fname in os.listdir(DATA_DIR):
-        if fname.endswith("_annotations.json") and not fname.startswith("_"):
-            annotations.extend(_read_json(os.path.join(DATA_DIR, fname), default=[]))
-    return annotations
 
 
 _GENERATORS = {}
@@ -266,14 +256,6 @@ def _extract_replicate_urls(output) -> list:
         return urls
     return [str(output)]
 
-
-def save_image_to_disk(image_bytes: bytes, participant_id: str, prompt_idx: int, model: str, image_idx: int) -> str:
-    participant_dir = os.path.join(IMAGES_DIR, participant_id)
-    os.makedirs(participant_dir, exist_ok=True)
-    filepath = os.path.join(participant_dir, f"prompt{prompt_idx}_{model}_{image_idx}.png")
-    with open(filepath, "wb") as f:
-        f.write(image_bytes)
-    return filepath
 
 
 def _annotations_path(participant_id: str) -> str:

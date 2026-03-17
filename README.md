@@ -1,6 +1,6 @@
 # Red Team Image Bias Evaluation
 
-A participatory red teaming tool that lets anyone run a workshop where people from different communities can test and evaluate how AI image generation systems represent - or fail to represent - them, and surface the real-world harms that bias in these systems creates.
+AI image generators have biases. The people most affected by those biases should be the ones evaluating them. This tool lets you run a workshop where participants from any community can test how current image generation systems see them, flag what's wrong, and explain why it matters.
 
 ## Background
 

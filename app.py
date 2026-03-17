@@ -23,9 +23,12 @@ _DEFAULTS = {
     "prompts": [],
     "current_shared_prompt_idx": 0,
     "shared_prompts_completed": False,
-    "rating_queue": [],
-    "rating_queue_idx": 0,
     "current_prompt_results": {},
+    "current_prompt_meta": {},
+    "scored_models": {},
+    "text_queue": [],
+    "text_queue_idx": 0,
+    "text_responses": {},
 }
 
 for key, val in _DEFAULTS.items():
@@ -46,7 +49,7 @@ elif st.session_state.current_phase == PHASE_GALLERY and not st.session_state.cu
     st.session_state.current_phase = PHASE_EXPLORE
     _redirected = True
 
-elif st.session_state.current_phase == PHASE_ANNOTATE and not st.session_state.rating_queue:
+elif st.session_state.current_phase == PHASE_ANNOTATE and not st.session_state.scored_models:
     st.session_state.current_phase = PHASE_EXPLORE
     _redirected = True
 

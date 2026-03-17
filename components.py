@@ -8,7 +8,6 @@ from data import generate_images
 
 
 def generate_with_progress(prompt: str, model_keys: List[str], num_images: int = 4) -> Dict[str, Dict]:
-    # Randomize generation order so position doesn't reveal identity
     shuffled = list(model_keys)
     random.shuffle(shuffled)
 
@@ -51,28 +50,55 @@ def show_image_grid(result: Dict, max_per_row: int = 4):
                     st.error(f"Could not load image {i + 1}: {e}")
 
 
-def show_gallery(results: Dict[str, Dict]):
-    model_keys = [mk for mk in results if results[mk].get("status") == "success"]
-    errored = [mk for mk in results if results[mk].get("status") not in ("success", "refused")]
-    refused = [mk for mk in results if results[mk].get("status") == "refused"]
+def render_model_card(mk: str, result: Dict, key_prefix: str):
+    """Render a model's images + compact inline scores."""
+    name = BLIND_NAMES[mk]
+    st.markdown(f"### {name}")
 
-    per_row = 3
-    for i in range(0, len(model_keys), per_row):
-        row = model_keys[i:i + per_row]
-        cols = st.columns(per_row)
-        for col, mk in zip(cols, row):
-            with col:
-                st.markdown(f"**{BLIND_NAMES[mk]}**")
-                show_image_grid(results[mk], max_per_row=2)
+    if result.get("status") == "refused":
+        st.warning("Refused to generate.")
+        render_refusal_field(key_prefix)
+        return
 
-    if refused:
-        for mk in refused:
-            st.warning(f"**{BLIND_NAMES[mk]}** refused to generate images for this prompt.")
+    if result.get("status") == "error":
+        msg = result.get("message", "Unknown error")[:100]
+        st.error(f"Error: {msg}")
+        return
 
-    if errored:
-        for mk in errored:
-            msg = results[mk].get("message", "Unknown error")[:100]
-            st.error(f"**{BLIND_NAMES[mk]}** failed: {msg}")
+    show_image_grid(result, max_per_row=2)
+    render_compact_scores(key_prefix)
+
+
+def render_compact_scores(key_prefix: str):
+    """Render just the score radio buttons — no text fields."""
+    auth_rubric = SCORING_RUBRIC["authenticity"]
+    auth_options = auth_rubric["options"]
+    st.markdown(f"**{auth_rubric['question']}**")
+    st.radio(
+        auth_rubric["label"],
+        options=range(len(auth_options)),
+        format_func=lambda i, opts=auth_options: f"{i} — {opts[i]}",
+        index=None,
+        key=f"{key_prefix}_authenticity",
+        horizontal=True,
+    )
+
+    scores = read_scores(key_prefix)
+    if is_nonsensical(scores):
+        return
+
+    for metric in ["diversity", "respectfulness"]:
+        rubric = SCORING_RUBRIC[metric]
+        options = rubric["options"]
+        st.markdown(f"**{rubric['question']}**")
+        st.radio(
+            rubric["label"],
+            options=range(len(options)),
+            format_func=lambda i, opts=options: f"{i + 1} — {opts[i]}",
+            index=None,
+            key=f"{key_prefix}_{metric}",
+            horizontal=True,
+        )
 
 
 def render_scoring_form(key_prefix: str):
@@ -151,7 +177,7 @@ def is_nonsensical(scores: Dict[str, Optional[int]]) -> bool:
     return scores.get("authenticity") == 0
 
 
-def validate_annotation(scores: Dict[str, Optional[int]], expectation: str, authenticity_note: str, harm_note: str) -> bool:
+def validate_scores_only(scores: Dict[str, Optional[int]]) -> bool:
     if scores.get("authenticity") is None:
         st.error("Please rate Authenticity.")
         return False
@@ -161,6 +187,10 @@ def validate_annotation(scores: Dict[str, Optional[int]], expectation: str, auth
     if missing:
         st.error(f"Please rate all dimensions: {', '.join(missing)}")
         return False
+    return True
+
+
+def validate_text_fields(expectation: str, authenticity_note: str, harm_note: str) -> bool:
     if not expectation.strip():
         st.error("Please describe what you expected vs. what you got.")
         return False

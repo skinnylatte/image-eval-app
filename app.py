@@ -64,22 +64,48 @@ phase = st.session_state.current_phase
 
 if phase != PHASE_WELCOME and not _is_facilitator and st.session_state.participant_id:
     from data import annotation_count
+    from config import PROMPT_TARGET, SHARED_PROMPTS
 
     with st.sidebar:
         count = annotation_count()
         total_prompts = len(st.session_state.prompts)
-        st.progress(min(total_prompts / 8, 1.0), text=f"{total_prompts} prompts completed")
-        st.caption(f"{count} ratings saved")
+        shared_done = st.session_state.shared_prompts_completed
+        shared_idx = st.session_state.get("current_shared_prompt_idx", 0)
 
+        # Step indicator
+        if not shared_done:
+            st.markdown(f"**Step 1 of 2:** Shared prompts ({shared_idx} of {len(SHARED_PROMPTS)})")
+        else:
+            st.markdown(f"**Step 2 of 2:** Free exploration")
+            st.progress(min(total_prompts / PROMPT_TARGET, 1.0),
+                        text=f"{total_prompts} of {PROMPT_TARGET} prompts")
+
+        st.caption(f"You've reviewed {count} image sets so far")
+
+        # Warm encouragement
+        if count == 0:
+            st.markdown("*Your perspective as an expert matters.*")
+        elif count < 10:
+            st.markdown("*Great start — keep going!*")
+        else:
+            st.markdown("*Amazing work. You're making a real difference.*")
+
+        # Navigation
         st.markdown("---")
-        if phase not in (PHASE_EXPLORE, PHASE_GALLERY, PHASE_ANNOTATE):
-            if st.button("Write a new prompt", use_container_width=True):
-                st.session_state.current_phase = PHASE_EXPLORE
+        if not shared_done:
+            if st.button("Continue shared prompts", use_container_width=True,
+                         disabled=(phase == PHASE_SHARED), type="primary"):
+                st.session_state.current_phase = PHASE_SHARED
                 st.rerun()
-        if phase != PHASE_RESULTS:
-            if st.button("View my ratings", use_container_width=True):
-                st.session_state.current_phase = PHASE_RESULTS
-                st.rerun()
+        if st.button("Write a new prompt", use_container_width=True,
+                     disabled=(phase in (PHASE_EXPLORE, PHASE_GALLERY, PHASE_ANNOTATE)),
+                     type="primary" if shared_done else "secondary"):
+            st.session_state.current_phase = PHASE_EXPLORE
+            st.rerun()
+        if st.button("View my ratings", use_container_width=True,
+                     disabled=(phase == PHASE_RESULTS)):
+            st.session_state.current_phase = PHASE_RESULTS
+            st.rerun()
 
 _PAGES = {
     PHASE_WELCOME: "_1_welcome",

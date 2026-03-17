@@ -22,14 +22,18 @@ def generate_anonymous_id() -> str:
 
 def assign_model_group(background: str) -> str:
     from config import BACKGROUND_GROUPS, MODEL_GROUPS
+    known_background = background in BACKGROUND_GROUPS
     groups = BACKGROUND_GROUPS.get(background, list(MODEL_GROUPS.keys()))
-    # Count existing participants per group to balance
     counts = {g: 0 for g in groups}
     for fname in os.listdir(DATA_DIR):
         if fname.startswith("_id_") and fname.endswith(".json"):
             data = _read_json(os.path.join(DATA_DIR, fname), default={})
-            if data.get("background") == background and data.get("model_group") in counts:
-                counts[data["model_group"]] += 1
+            g = data.get("model_group")
+            if g not in counts:
+                continue
+            if known_background and data.get("background") != background:
+                continue
+            counts[g] += 1
     return min(counts, key=counts.get)
 
 

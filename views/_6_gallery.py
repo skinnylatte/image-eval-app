@@ -1,8 +1,11 @@
 import random
 
 import streamlit as st
-from config import BLIND_NAMES, BIAS_CATEGORIES, MODELS, PHASE_ANNOTATE, PHASE_EXPLORE
-from components import render_model_card, read_scores, read_refusal_note, validate_scores_only, is_nonsensical
+from config import BLIND_NAMES, BIAS_CATEGORIES, PHASE_ANNOTATE, PHASE_EXPLORE
+from components import show_image_grid
+
+
+TRIAGE_OPTIONS = ["Looks fine", "Problematic", "Nonsensical"]
 
 
 def run():
@@ -20,11 +23,12 @@ def run():
     ratable = [mk for mk in display_order if results.get(mk, {}).get("status") in ("success", "refused")]
     errored = [mk for mk in display_order if results.get(mk, {}).get("status") not in ("success", "refused")]
 
-    st.title("Compare and Score")
+    st.title("Compare and Triage")
     st.subheader(f'"{prompt_text}"')
     if category:
         st.caption(f"Category: {BIAS_CATEGORIES.get(category, category)}")
-    st.markdown("Score each system while comparing them side by side.")
+    st.markdown("For each system, choose: **Looks fine**, **Problematic**, or **Nonsensical**. "
+                "You'll write detailed responses only for the problematic ones.")
     st.markdown("---")
 
     per_row = 2
@@ -33,14 +37,27 @@ def run():
         cols = st.columns(per_row)
         for col, mk in zip(cols, row):
             with col:
-                prefix = f"gallery_{mk}"
-                render_model_card(mk, results[mk], prefix)
+                name = BLIND_NAMES[mk]
+                st.markdown(f"### {name}")
+                result = results[mk]
+
+                if result.get("status") == "refused":
+                    st.warning(f"{name} refused to generate images.")
+                else:
+                    show_image_grid(result, max_per_row=2)
+
+                st.radio(
+                    f"How is {name}'s output?",
+                    options=TRIAGE_OPTIONS,
+                    index=None,
+                    key=f"triage_{mk}",
+                    horizontal=True,
+                )
+        st.markdown("---")
 
     for mk in errored:
         msg = results[mk].get("message", "Unknown error")[:100]
         st.error(f"**{BLIND_NAMES[mk]}** failed: {msg}")
-
-    st.markdown("---")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -51,31 +68,39 @@ def run():
     with col2:
         if not ratable:
             st.warning("No systems produced results to rate.")
-        elif st.button("Continue to written responses", type="primary", use_container_width=True):
-            all_valid = True
-            scored_models = {}
-
+        elif st.button("Continue", type="primary", use_container_width=True):
+            triage = {}
+            all_triaged = True
             for mk in ratable:
-                prefix = f"gallery_{mk}"
-                if results[mk].get("status") == "refused":
-                    note = read_refusal_note(prefix)
-                    if not note:
-                        st.error(f"Please explain the significance of **{BLIND_NAMES[mk]}**'s refusal.")
-                        all_valid = False
-                    else:
-                        scored_models[mk] = {"status": "refused", "refusal_note": note}
+                val = st.session_state.get(f"triage_{mk}")
+                if val is None:
+                    st.error(f"Please triage **{BLIND_NAMES[mk]}**.")
+                    all_triaged = False
                 else:
-                    scores = read_scores(prefix)
-                    if not validate_scores_only(scores):
-                        all_valid = False
-                    else:
-                        scored_models[mk] = {"status": "success", "scores": scores}
+                    triage[mk] = val
 
-            if all_valid:
-                st.session_state.scored_models = scored_models
-                text_queue = [mk for mk, data in scored_models.items()
-                              if data["status"] == "success" and not is_nonsensical(data["scores"])]
-                st.session_state.text_queue = text_queue
+            if all_triaged:
+                st.session_state.triage_results = triage
+                deep_dive = [mk for mk, t in triage.items() if t == "Problematic"]
+                refused = [mk for mk in ratable if results[mk].get("status") == "refused"]
+
+                st.session_state.scored_models = {}
+                for mk, t in triage.items():
+                    if t == "Nonsensical":
+                        st.session_state.scored_models[mk] = {
+                            "status": "success",
+                            "scores": {"authenticity": 0, "diversity": None, "respectfulness": None},
+                        }
+                    elif t == "Looks fine":
+                        st.session_state.scored_models[mk] = {
+                            "status": "success",
+                            "scores": {"authenticity": 5, "diversity": None, "respectfulness": None},
+                        }
+                    elif mk in refused:
+                        note = ""  # will be collected in deep dive
+                        st.session_state.scored_models[mk] = {"status": "refused", "refusal_note": ""}
+
+                st.session_state.text_queue = deep_dive + refused
                 st.session_state.text_queue_idx = 0
                 st.session_state.pop("gallery_order", None)
                 st.session_state.current_phase = PHASE_ANNOTATE

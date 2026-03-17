@@ -27,6 +27,7 @@ _DEFAULTS = {
     "current_prompt_results": {},
     "current_prompt_meta": {},
     "scored_models": {},
+    "triage_results": {},
     "text_queue": [],
     "text_queue_idx": 0,
     "text_responses": {},

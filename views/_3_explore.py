@@ -37,7 +37,7 @@ def run():
         placeholder="E.g., 'A successful Pakistani businesswoman giving a keynote speech'",
         height=100,
     )
-    num_images = st.slider("Images per system", 1, 6, 4)
+    num_images = st.slider("Images per system", 1, 4, 2)
 
     if st.button("Generate from your systems", use_container_width=True, type="primary"):
         if not custom_prompt.strip():

@@ -27,7 +27,7 @@ def run():
     st.markdown("Score each system while comparing them side by side.")
     st.markdown("---")
 
-    per_row = 3
+    per_row = 2
     for i in range(0, len(ratable), per_row):
         row = ratable[i:i + per_row]
         cols = st.columns(per_row)

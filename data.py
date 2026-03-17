@@ -20,13 +20,33 @@ def generate_anonymous_id() -> str:
     return f"P-{uuid.uuid4().hex[:8]}"
 
 
-def save_identity_mapping(anonymous_id: str, real_name: str, background: str):
+def assign_model_group(background: str) -> str:
+    from config import BACKGROUND_GROUPS, MODEL_GROUPS
+    groups = BACKGROUND_GROUPS.get(background, list(MODEL_GROUPS.keys()))
+    # Count existing participants per group to balance
+    counts = {g: 0 for g in groups}
+    for fname in os.listdir(DATA_DIR):
+        if fname.startswith("_id_") and fname.endswith(".json"):
+            data = _read_json(os.path.join(DATA_DIR, fname), default={})
+            if data.get("background") == background and data.get("model_group") in counts:
+                counts[data["model_group"]] += 1
+    return min(counts, key=counts.get)
+
+
+def get_participant_models() -> List[str]:
+    from config import MODEL_GROUPS
+    group = st.session_state.get("model_group", "A")
+    return MODEL_GROUPS[group]
+
+
+def save_identity_mapping(anonymous_id: str, real_name: str, background: str, model_group: str):
     """One file per participant to avoid race conditions on a shared file."""
     path = os.path.join(DATA_DIR, f"_id_{anonymous_id}.json")
     _write_json(path, {
         "anonymous_id": anonymous_id,
         "name": real_name,
         "background": background,
+        "model_group": model_group,
         "registered_at": datetime.now(timezone.utc).isoformat(),
     })
 

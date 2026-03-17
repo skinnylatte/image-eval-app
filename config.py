@@ -74,6 +74,20 @@ PROMPT_TARGET = 8
 
 BACKGROUNDS = ["Pakistan", "Iran", "Turkey", "Egypt"]
 
+MODEL_GROUPS = {
+    "A": ["dalle", "imagen", "hunyuan"],
+    "B": ["stable_diffusion", "flux", "hunyuan"],
+    "C": ["dalle", "flux", "hunyuan"],
+    "D": ["stable_diffusion", "imagen", "hunyuan"],
+}
+
+BACKGROUND_GROUPS = {
+    "Pakistan": ["A", "B"],
+    "Iran": ["C", "D"],
+    "Turkey": ["B", "C"],
+    "Egypt": ["D", "A"],
+}
+
 import os
 
 PARTICIPANT_TOKENS = set(

@@ -1,6 +1,6 @@
 import streamlit as st
 from config import BACKGROUNDS, PHASE_SHARED, PARTICIPANT_TOKENS
-from data import generate_anonymous_id, save_identity_mapping
+from data import generate_anonymous_id, assign_model_group, save_identity_mapping
 
 
 def run():
@@ -27,16 +27,9 @@ def run():
         ## What are we doing?
 
         We're testing whether AI image generation systems represent your
-        community authentically and respectfully. You'll be comparing 5
-        systems built by different companies. You won't know which
-        company made which system — this keeps your ratings unbiased.
-
-        The systems are:
-        - **Cookie**
-        - **Mila**
-        - **Pepper**
-        - **Biscuit**
-        - **Noodle**
+        community authentically and respectfully. You'll be assigned 3
+        systems to compare — built by different companies from the US
+        and China. You won't know which company made which system.
 
         **Your role:** Use your lived experience as an expert to uncover biases these systems have.
 
@@ -98,10 +91,12 @@ def run():
             st.error("Please read and accept the consent statement")
         else:
             anon_id = generate_anonymous_id()
-            save_identity_mapping(anon_id, name, background)
+            group = assign_model_group(background)
+            save_identity_mapping(anon_id, name, background, group)
             st.session_state.participant_id = anon_id
             st.session_state.participant_display_name = name.split()[0]
             st.session_state.participant_background = background
+            st.session_state.model_group = group
             st.session_state.participant_token = token
             st.session_state.current_phase = PHASE_SHARED
             st.rerun()

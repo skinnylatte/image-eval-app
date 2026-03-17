@@ -1,5 +1,6 @@
 import streamlit as st
-from config import SHARED_PROMPTS, MODELS, BIAS_CATEGORIES, PHASE_EXPLORE, PHASE_GALLERY
+from config import SHARED_PROMPTS, BIAS_CATEGORIES, PHASE_EXPLORE, PHASE_GALLERY
+from data import get_participant_models
 from components import generate_with_progress
 
 
@@ -23,17 +24,15 @@ def run():
 
     shared = SHARED_PROMPTS[idx]
     prompt, category = shared["prompt"], shared["category"]
-    models = list(MODELS.keys())
+    models = get_participant_models()
 
     st.progress(idx / len(SHARED_PROMPTS), text=f"Shared prompt {idx + 1} of {len(SHARED_PROMPTS)}")
     st.subheader(f'Prompt: "{prompt}"')
     st.caption(f"Category: {BIAS_CATEGORIES[category]}")
 
-    if st.button("Generate images from all systems", type="primary", use_container_width=True):
+    if st.button("Generate images from your systems", type="primary", use_container_width=True):
         results = generate_with_progress(prompt, models)
 
-        # After rating all models for this shared prompt, _4_annotate will
-        # increment current_shared_prompt_idx via prompt_meta callback
         st.session_state.current_prompt_results = results
         st.session_state.current_prompt_meta = {
             "prompt": prompt,

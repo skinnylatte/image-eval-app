@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import streamlit as st
 
 from config import BIAS_CATEGORIES, MODELS, PROMPT_TARGET, PHASE_GALLERY, PHASE_RESULTS
-from data import annotation_count
+from data import annotation_count, get_participant_models
 from components import generate_with_progress
 
 
@@ -39,11 +39,11 @@ def run():
     )
     num_images = st.slider("Images per system", 1, 6, 4)
 
-    if st.button("Generate from all systems", use_container_width=True, type="primary"):
+    if st.button("Generate from your systems", use_container_width=True, type="primary"):
         if not custom_prompt.strip():
             st.error("Please enter a prompt")
         else:
-            model_keys = list(MODELS.keys())
+            model_keys = get_participant_models()
             results = generate_with_progress(custom_prompt, model_keys, num_images)
 
             prompt_idx = len(st.session_state.prompts)

@@ -40,16 +40,17 @@ class TestAnonymousId:
 
 class TestIdentityMapping:
     def test_save_and_load(self):
-        data_mod.save_identity_mapping("P-testtest", "Alice", "Pakistan")
+        data_mod.save_identity_mapping("P-testtest", "Alice", "Pakistan", "A")
         path = os.path.join(data_mod.DATA_DIR, "_id_P-testtest.json")
         mapping = data_mod._read_json(path, default={})
         assert mapping["name"] == "Alice"
         assert mapping["background"] == "Pakistan"
+        assert mapping["model_group"] == "A"
         assert "registered_at" in mapping
 
     def test_multiple_participants_no_race(self):
-        data_mod.save_identity_mapping("P-aaa10001", "Bob", "Iran")
-        data_mod.save_identity_mapping("P-aaa20002", "Carol", "Turkey")
+        data_mod.save_identity_mapping("P-aaa10001", "Bob", "Iran", "C")
+        data_mod.save_identity_mapping("P-aaa20002", "Carol", "Turkey", "B")
         bob = data_mod._read_json(os.path.join(data_mod.DATA_DIR, "_id_P-aaa10001.json"), default={})
         carol = data_mod._read_json(os.path.join(data_mod.DATA_DIR, "_id_P-aaa20002.json"), default={})
         assert bob["name"] == "Bob"

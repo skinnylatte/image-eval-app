@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 import streamlit as st
 
-from config import SCORING_RUBRIC, BLIND_NAMES
+from config import SCORING_RUBRIC, SCORING_RUBRIC_SHARED, BLIND_NAMES
 from data import generate_images
 
 
@@ -83,8 +83,9 @@ def render_compact_scores(key_prefix: str):
         )
 
 
-def render_scoring_form(key_prefix: str):
-    for metric, rubric in SCORING_RUBRIC.items():
+def render_scoring_form(key_prefix: str, prompt_type: str = "free"):
+    rubric_set = SCORING_RUBRIC if prompt_type == "free" else SCORING_RUBRIC_SHARED
+    for metric, rubric in rubric_set.items():
         st.markdown(f"**{rubric['question']}**")
         options = rubric["options"]
         start = 0 if len(options) > 5 else 1

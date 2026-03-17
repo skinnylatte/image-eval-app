@@ -45,7 +45,7 @@ def run():
         show_image_grid(result, max_per_row=2)
         st.markdown("---")
         st.markdown("**Score this system:**")
-        render_scoring_form(prefix)
+        render_scoring_form(prefix, prompt_type)
         st.markdown("---")
         render_qualitative_fields(prefix, prompt_type)
 

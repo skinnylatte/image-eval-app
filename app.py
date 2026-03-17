@@ -66,27 +66,20 @@ if phase != PHASE_WELCOME and not _is_facilitator and st.session_state.participa
     from data import annotation_count
 
     with st.sidebar:
-        st.markdown(f"**Participant:** {st.session_state.participant_display_name}")
-        st.markdown(f"**Background:** {st.session_state.participant_background}")
-        st.markdown(f"**ID:** `{st.session_state.participant_id}`")
-        st.markdown("---")
-        st.markdown(f"**Annotations:** {annotation_count()}")
-        st.markdown(f"**Prompts:** {len(st.session_state.prompts)}")
-        st.markdown("---")
-        st.markdown("**Need a break?** That's okay. Tell your facilitator.")
+        count = annotation_count()
+        total_prompts = len(st.session_state.prompts)
+        st.progress(min(total_prompts / 8, 1.0), text=f"{total_prompts} prompts completed")
+        st.caption(f"{count} ratings saved")
 
         st.markdown("---")
-        nav_col1, nav_col2 = st.columns(2)
-        with nav_col1:
-            if phase not in (PHASE_EXPLORE, PHASE_GALLERY, PHASE_ANNOTATE):
-                if st.button("Explore", use_container_width=True):
-                    st.session_state.current_phase = PHASE_EXPLORE
-                    st.rerun()
-        with nav_col2:
-            if phase != PHASE_RESULTS:
-                if st.button("Results", use_container_width=True):
-                    st.session_state.current_phase = PHASE_RESULTS
-                    st.rerun()
+        if phase not in (PHASE_EXPLORE, PHASE_GALLERY, PHASE_ANNOTATE):
+            if st.button("Write a new prompt", use_container_width=True):
+                st.session_state.current_phase = PHASE_EXPLORE
+                st.rerun()
+        if phase != PHASE_RESULTS:
+            if st.button("View my ratings", use_container_width=True):
+                st.session_state.current_phase = PHASE_RESULTS
+                st.rerun()
 
 _PAGES = {
     PHASE_WELCOME: "_1_welcome",

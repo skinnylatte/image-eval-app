@@ -105,6 +105,22 @@ def annotation_count() -> int:
     return len(load_annotations(st.session_state.participant_id))
 
 
+def load_all_annotations() -> List[Dict]:
+    all_annotations = []
+    for fname in os.listdir(DATA_DIR):
+        if fname.endswith("_annotations.json") and not fname.startswith("_id_"):
+            all_annotations.extend(_read_json(os.path.join(DATA_DIR, fname), default=[]))
+    return all_annotations
+
+
+def load_all_identities() -> List[Dict]:
+    identities = []
+    for fname in os.listdir(DATA_DIR):
+        if fname.startswith("_id_") and fname.endswith(".json"):
+            identities.append(_read_json(os.path.join(DATA_DIR, fname), default={}))
+    return identities
+
+
 
 _GENERATORS = {}
 

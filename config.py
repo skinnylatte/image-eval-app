@@ -78,6 +78,7 @@ import os
 PARTICIPANT_TOKENS = set(
     t.strip() for t in os.environ.get("PARTICIPANT_TOKENS", "").split(",") if t.strip()
 )
+FACILITATOR_TOKEN = os.environ.get("FACILITATOR_TOKEN", "").strip()
 
 PHASE_WELCOME = "welcome"
 PHASE_SHARED = "shared_prompts"
@@ -85,3 +86,4 @@ PHASE_EXPLORE = "red_team"
 PHASE_GALLERY = "gallery"
 PHASE_ANNOTATE = "annotate"
 PHASE_RESULTS = "analyze"
+PHASE_FACILITATOR = "facilitator"

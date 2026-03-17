@@ -159,6 +159,33 @@ class TestSaveLoadAnnotations:
 
 
 
+class TestLoadAll:
+    def test_load_all_identities(self):
+        # Earlier tests already saved identity files for P-testtest, P-aaa10001, P-aaa20002
+        identities = data_mod.load_all_identities()
+        names = {i["name"] for i in identities}
+        assert "Alice" in names
+        assert "Bob" in names
+
+    def test_load_all_annotations(self):
+        # Earlier tests saved annotations for P-rt01 and P-ap01
+        all_anns = data_mod.load_all_annotations()
+        assert len(all_anns) >= 4  # 1 from roundtrip + 3 from append
+        pids = {a["participant_id"] for a in all_anns}
+        assert "P-rt01" in pids
+        assert "P-ap01" in pids
+
+    def test_load_all_empty_dir(self):
+        import tempfile
+        orig = data_mod.DATA_DIR
+        data_mod.DATA_DIR = tempfile.mkdtemp()
+        try:
+            assert data_mod.load_all_annotations() == []
+            assert data_mod.load_all_identities() == []
+        finally:
+            data_mod.DATA_DIR = orig
+
+
 class TestGenerateImages:
     def test_unknown_model_returns_error(self):
         result = data_mod.generate_images("A doctor", "nonexistent", 4)

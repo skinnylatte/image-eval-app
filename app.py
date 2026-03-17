@@ -4,6 +4,7 @@ import streamlit as st
 from config import (
     PHASE_WELCOME, PHASE_SHARED, PHASE_EXPLORE,
     PHASE_GALLERY, PHASE_ANNOTATE, PHASE_RESULTS,
+    PHASE_FACILITATOR,
 )
 
 st.set_page_config(
@@ -36,30 +37,32 @@ for key, val in _DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
+_is_facilitator = st.session_state.participant_id == "__facilitator__"
 _redirected = False
 
-if st.session_state.current_phase != PHASE_WELCOME and not st.session_state.participant_id:
-    st.session_state.current_phase = PHASE_WELCOME
-    _redirected = True
+if not _is_facilitator:
+    if st.session_state.current_phase != PHASE_WELCOME and not st.session_state.participant_id:
+        st.session_state.current_phase = PHASE_WELCOME
+        _redirected = True
 
-elif st.session_state.current_phase == PHASE_SHARED and st.session_state.shared_prompts_completed:
-    st.session_state.current_phase = PHASE_EXPLORE
-    _redirected = True
+    elif st.session_state.current_phase == PHASE_SHARED and st.session_state.shared_prompts_completed:
+        st.session_state.current_phase = PHASE_EXPLORE
+        _redirected = True
 
-elif st.session_state.current_phase == PHASE_GALLERY and not st.session_state.current_prompt_results:
-    st.session_state.current_phase = PHASE_EXPLORE
-    _redirected = True
+    elif st.session_state.current_phase == PHASE_GALLERY and not st.session_state.current_prompt_results:
+        st.session_state.current_phase = PHASE_EXPLORE
+        _redirected = True
 
-elif st.session_state.current_phase == PHASE_ANNOTATE and not st.session_state.scored_models:
-    st.session_state.current_phase = PHASE_EXPLORE
-    _redirected = True
+    elif st.session_state.current_phase == PHASE_ANNOTATE and not st.session_state.scored_models:
+        st.session_state.current_phase = PHASE_EXPLORE
+        _redirected = True
 
 if _redirected:
     st.rerun()
 
 phase = st.session_state.current_phase
 
-if phase != PHASE_WELCOME and st.session_state.participant_id:
+if phase != PHASE_WELCOME and not _is_facilitator and st.session_state.participant_id:
     from data import annotation_count
 
     with st.sidebar:
@@ -92,6 +95,7 @@ _PAGES = {
     PHASE_GALLERY: "_6_gallery",
     PHASE_ANNOTATE: "_4_annotate",
     PHASE_RESULTS: "_5_results",
+    PHASE_FACILITATOR: "_7_facilitator",
 }
 
 page_module = _PAGES.get(phase)

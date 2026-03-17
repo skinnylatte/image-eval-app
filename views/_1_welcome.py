@@ -1,5 +1,5 @@
 import streamlit as st
-from config import BACKGROUNDS, PHASE_SHARED, PARTICIPANT_TOKENS
+from config import BACKGROUNDS, PHASE_SHARED, PHASE_FACILITATOR, PARTICIPANT_TOKENS, FACILITATOR_TOKEN
 from data import generate_anonymous_id, save_identity_mapping
 
 
@@ -11,6 +11,13 @@ def run():
 
     if not token:
         st.info("You need a participant token to access this workshop. If you don't have one, contact your facilitator.")
+        return
+
+    if FACILITATOR_TOKEN and token == FACILITATOR_TOKEN:
+        st.session_state.participant_id = "__facilitator__"
+        st.session_state.participant_display_name = "Facilitator"
+        st.session_state.current_phase = PHASE_FACILITATOR
+        st.rerun()
         return
 
     if token not in PARTICIPANT_TOKENS:

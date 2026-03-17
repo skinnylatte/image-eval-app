@@ -17,37 +17,18 @@ def generate_anonymous_id() -> str:
     return f"P-{uuid.uuid4().hex[:8]}"
 
 
-def assign_model_group(background: str) -> str:
-    from config import BACKGROUND_GROUPS, MODEL_GROUPS
-    known_background = background in BACKGROUND_GROUPS
-    groups = BACKGROUND_GROUPS.get(background, list(MODEL_GROUPS.keys()))
-    counts = {g: 0 for g in groups}
-    for fname in os.listdir(DATA_DIR):
-        if fname.startswith("_id_") and fname.endswith(".json"):
-            data = _read_json(os.path.join(DATA_DIR, fname), default={})
-            g = data.get("model_group")
-            if g not in counts:
-                continue
-            if known_background and data.get("background") != background:
-                continue
-            counts[g] += 1
-    return min(counts, key=counts.get)
-
-
 def get_participant_models() -> List[str]:
-    from config import MODEL_GROUPS
-    group = st.session_state.get("model_group", "A")
-    return MODEL_GROUPS[group]
+    from config import MODELS
+    return list(MODELS.keys())
 
 
-def save_identity_mapping(anonymous_id: str, real_name: str, background: str, model_group: str):
+def save_identity_mapping(anonymous_id: str, real_name: str, background: str):
     """One file per participant to avoid race conditions on a shared file."""
     path = os.path.join(DATA_DIR, f"_id_{anonymous_id}.json")
     _write_json(path, {
         "anonymous_id": anonymous_id,
         "name": real_name,
         "background": background,
-        "model_group": model_group,
         "registered_at": datetime.now(timezone.utc).isoformat(),
     })
 
@@ -143,21 +124,6 @@ def _generate_dalle(prompt: str, num_images: int) -> Dict:
             raise
     return {"status": "success", "images": images, "message": None}
 
-
-@_generator("stable_diffusion")
-def _generate_stable_diffusion(prompt: str, num_images: int) -> Dict:
-    url = "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0"
-    headers = {"Authorization": f"Bearer {_require_env('HF_API_TOKEN')}"}
-    images = []
-    for _ in range(num_images):
-        resp = requests.post(url, headers=headers, json={"inputs": prompt}, timeout=60)
-        if resp.status_code == 200:
-            images.append(resp.content)
-        elif resp.status_code == 400:
-            return {"status": "refused", "images": [], "message": resp.text}
-        else:
-            return {"status": "error", "images": [], "message": f"HTTP {resp.status_code}: {resp.text[:200]}"}
-    return {"status": "success", "images": images, "message": None}
 
 
 @_generator("flux")

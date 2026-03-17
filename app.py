@@ -23,7 +23,6 @@ _DEFAULTS = {
     "prompts": [],
     "current_shared_prompt_idx": 0,
     "shared_prompts_completed": False,
-    "model_group": "A",
     "current_prompt_results": {},
     "current_prompt_meta": {},
     "scored_models": {},

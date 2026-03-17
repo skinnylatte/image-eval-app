@@ -1,6 +1,5 @@
 MODELS = {
     "dalle": "DALL-E 3",
-    "stable_diffusion": "Stable Diffusion XL",
     "flux": "Flux 1.1 Pro",
     "imagen": "Google Imagen 4",
     "hunyuan": "Hunyuan Image 3.0",
@@ -8,7 +7,6 @@ MODELS = {
 
 BLIND_NAMES = {
     "dalle": "Cookie",
-    "stable_diffusion": "Mila",
     "flux": "Pepper",
     "imagen": "Biscuit",
     "hunyuan": "Noodle",
@@ -74,19 +72,6 @@ PROMPT_TARGET = 8
 
 BACKGROUNDS = ["Pakistan", "Iran", "Turkey", "Egypt"]
 
-MODEL_GROUPS = {
-    "A": ["dalle", "imagen", "hunyuan"],
-    "B": ["stable_diffusion", "flux", "hunyuan"],
-    "C": ["dalle", "flux", "hunyuan"],
-    "D": ["stable_diffusion", "imagen", "hunyuan"],
-}
-
-BACKGROUND_GROUPS = {
-    "Pakistan": ["A", "B"],
-    "Iran": ["C", "D"],
-    "Turkey": ["B", "C"],
-    "Egypt": ["D", "A"],
-}
 
 import os
 

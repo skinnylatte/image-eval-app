@@ -38,17 +38,16 @@ class TestAnonymousId:
 
 class TestIdentityMapping:
     def test_save_and_load(self):
-        data_mod.save_identity_mapping("P-testtest", "Alice", "Pakistan", "A")
+        data_mod.save_identity_mapping("P-testtest", "Alice", "Pakistan")
         path = os.path.join(data_mod.DATA_DIR, "_id_P-testtest.json")
         mapping = data_mod._read_json(path, default={})
         assert mapping["name"] == "Alice"
         assert mapping["background"] == "Pakistan"
-        assert mapping["model_group"] == "A"
         assert "registered_at" in mapping
 
     def test_multiple_participants_no_race(self):
-        data_mod.save_identity_mapping("P-aaa10001", "Bob", "Iran", "C")
-        data_mod.save_identity_mapping("P-aaa20002", "Carol", "Turkey", "B")
+        data_mod.save_identity_mapping("P-aaa10001", "Bob", "Iran")
+        data_mod.save_identity_mapping("P-aaa20002", "Carol", "Turkey")
         bob = data_mod._read_json(os.path.join(data_mod.DATA_DIR, "_id_P-aaa10001.json"), default={})
         carol = data_mod._read_json(os.path.join(data_mod.DATA_DIR, "_id_P-aaa20002.json"), default={})
         assert bob["name"] == "Bob"
@@ -119,9 +118,9 @@ class TestSaveLoadAnnotations:
         ann = data_mod.build_annotation(
             prompt="Test prompt",
             category="profession",
-            model_key="stable_diffusion",
-            model_name="Stable Diffusion XL",
-            blind_name="Mila",
+            model_key="flux",
+            model_name="Flux 1.1 Pro",
+            blind_name="Pepper",
             prompt_type="free",
             status="success",
             scores={"authenticity": 2, "diversity": 1, "respectfulness": 3},
@@ -167,10 +166,10 @@ class TestGenerateImages:
         assert "Unknown model" in result["message"]
 
     def test_missing_api_key_returns_error(self):
-        for var in ["OPENAI_API_KEY", "HF_API_TOKEN", "GOOGLE_API_KEY",
+        for var in ["OPENAI_API_KEY", "GOOGLE_API_KEY",
                      "DASHSCOPE_API_KEY", "REPLICATE_API_TOKEN"]:
             os.environ.pop(var, None)
 
-        for model_key in ["dalle", "stable_diffusion", "imagen"]:
+        for model_key in ["dalle", "imagen"]:
             result = data_mod.generate_images("A doctor", model_key, 1)
             assert result["status"] == "error", f"{model_key} should fail without API key"

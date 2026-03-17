@@ -4,13 +4,22 @@ from data import generate_anonymous_id, save_identity_mapping
 
 
 def run():
-    st.title("Home")
+    st.title("Red Team Image Bias Evaluation")
+    st.markdown(
+        "This is a participatory red teaming tool for evaluating bias in AI image generation systems. "
+        "Participants from underrepresented communities test how these systems represent their cultures, "
+        "identities, and lived experiences."
+    )
+    st.markdown(
+        "To run your own workshop, see the "
+        "[setup instructions on GitHub](https://github.com/skinnylatte/image-eval-app)."
+    )
     st.markdown("---")
 
-    token = st.text_input("Enter your participant token to begin", type="password")
+    token = st.text_input("Enter your passcode to begin", type="password")
 
     if not token:
-        st.info("You need a participant token to access this workshop. If you don't have one, contact your facilitator.")
+        st.info("You need a passcode to access this workshop. If you don't have one, ask your facilitator.")
         return
 
     if FACILITATOR_TOKEN and token == FACILITATOR_TOKEN:
@@ -21,10 +30,10 @@ def run():
         return
 
     if token not in PARTICIPANT_TOKENS:
-        st.error("Invalid token. Please check with your facilitator.")
+        st.error("Invalid passcode. Please check with your facilitator.")
         return
 
-    st.success("Token accepted.")
+    st.success("Passcode accepted.")
     st.markdown("---")
 
     col1, col2 = st.columns(2)

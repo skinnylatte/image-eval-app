@@ -52,13 +52,27 @@ def show_image_grid(result: Dict, max_per_row: int = 4):
 
 
 def show_gallery(results: Dict[str, Dict]):
-    """Show all models' images side by side using blind names."""
-    model_keys = list(results.keys())
-    cols = st.columns(len(model_keys))
-    for col, mk in zip(cols, model_keys):
-        with col:
-            st.markdown(f"**{BLIND_NAMES[mk]}**")
-            show_image_grid(results[mk], max_per_row=2)
+    model_keys = [mk for mk in results if results[mk].get("status") == "success"]
+    errored = [mk for mk in results if results[mk].get("status") not in ("success", "refused")]
+    refused = [mk for mk in results if results[mk].get("status") == "refused"]
+
+    per_row = 3
+    for i in range(0, len(model_keys), per_row):
+        row = model_keys[i:i + per_row]
+        cols = st.columns(per_row)
+        for col, mk in zip(cols, row):
+            with col:
+                st.markdown(f"**{BLIND_NAMES[mk]}**")
+                show_image_grid(results[mk], max_per_row=2)
+
+    if refused:
+        for mk in refused:
+            st.warning(f"**{BLIND_NAMES[mk]}** refused to generate images for this prompt.")
+
+    if errored:
+        for mk in errored:
+            msg = results[mk].get("message", "Unknown error")[:100]
+            st.error(f"**{BLIND_NAMES[mk]}** failed: {msg}")
 
 
 def render_scoring_form(key_prefix: str):

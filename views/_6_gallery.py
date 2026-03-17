@@ -38,11 +38,12 @@ def run():
             st.session_state.current_phase = PHASE_EXPLORE
             st.rerun()
     with col2:
-        if st.button("Start rating", type="primary", use_container_width=True):
-            # Rating order also shuffled, independent of gallery order
-            queue = list(results.keys())
-            random.shuffle(queue)
-            st.session_state.rating_queue = queue
+        ratable = [mk for mk in results if results[mk].get("status") in ("success", "refused")]
+        if not ratable:
+            st.warning("No systems produced results to rate.")
+        elif st.button("Start rating", type="primary", use_container_width=True):
+            random.shuffle(ratable)
+            st.session_state.rating_queue = ratable
             st.session_state.rating_queue_idx = 0
             st.session_state.pop("gallery_order", None)
             st.session_state.current_phase = PHASE_ANNOTATE

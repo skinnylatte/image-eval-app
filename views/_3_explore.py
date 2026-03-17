@@ -75,6 +75,13 @@ def run():
             st.session_state.current_phase = PHASE_GALLERY
             st.rerun()
 
+    prompts = st.session_state.get("prompts", [])
+    if prompts:
+        st.markdown("---")
+        st.subheader("Previous prompts")
+        for p in reversed(prompts):
+            st.markdown(f"- **{BIAS_CATEGORIES.get(p['category'], p['category'])}:** {p['prompt']}")
+
     st.markdown("---")
     if st.button("Continue to Results"):
         st.session_state.current_phase = PHASE_RESULTS

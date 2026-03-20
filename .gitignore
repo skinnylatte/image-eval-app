@@ -9,3 +9,11 @@ venv/
 tokens.md
 TODO.md
 paper/
+CLAUDE.md
+*.html
+*.md
+!README.md
+*.png
+*.jpg
+*.jpeg
+examples/

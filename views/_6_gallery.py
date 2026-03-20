@@ -80,39 +80,38 @@ def run():
                     st.rerun()
         with col2:
             if st.button("Save and continue", type="primary", use_container_width=True):
-            triage = {}
-            all_triaged = True
-            for mk in ratable:
-                val = st.session_state.get(f"triage_{mk}")
-                if val is None:
-                    st.error(f"Please triage **{BLIND_NAMES[mk]}**.")
-                    all_triaged = False
-                else:
-                    triage[mk] = val
+                triage = {}
+                all_triaged = True
+                for mk in ratable:
+                    val = st.session_state.get(f"triage_{mk}")
+                    if val is None:
+                        st.error(f"Please triage **{BLIND_NAMES[mk]}**.")
+                        all_triaged = False
+                    else:
+                        triage[mk] = val
 
-            if all_triaged:
-                st.session_state.triage_results = triage
-                deep_dive = [mk for mk, t in triage.items() if t == "Problematic"]
-                refused = [mk for mk in ratable if results[mk].get("status") == "refused"]
+                if all_triaged:
+                    st.session_state.triage_results = triage
+                    deep_dive = [mk for mk, t in triage.items() if t == "Problematic"]
+                    refused = [mk for mk in ratable if results[mk].get("status") == "refused"]
 
-                st.session_state.scored_models = {}
-                for mk, t in triage.items():
-                    if t == "Nonsensical":
-                        st.session_state.scored_models[mk] = {
-                            "status": "success",
-                            "scores": {"authenticity": 0, "diversity": None, "respectfulness": None},
-                        }
-                    elif t == "Looks fine":
-                        st.session_state.scored_models[mk] = {
-                            "status": "success",
-                            "scores": {"authenticity": 5, "diversity": None, "respectfulness": None},
-                        }
-                    elif mk in refused:
-                        note = ""  # will be collected in deep dive
-                        st.session_state.scored_models[mk] = {"status": "refused", "refusal_note": ""}
+                    st.session_state.scored_models = {}
+                    for mk, t in triage.items():
+                        if t == "Nonsensical":
+                            st.session_state.scored_models[mk] = {
+                                "status": "success",
+                                "scores": {"authenticity": 0, "diversity": None, "respectfulness": None},
+                            }
+                        elif t == "Looks fine":
+                            st.session_state.scored_models[mk] = {
+                                "status": "success",
+                                "scores": {"authenticity": 5, "diversity": None, "respectfulness": None},
+                            }
+                        elif mk in refused:
+                            st.session_state.scored_models[mk] = {"status": "refused", "refusal_note": ""}
 
-                st.session_state.text_queue = deep_dive + refused
-                st.session_state.text_queue_idx = 0
-                st.session_state.pop("gallery_order", None)
-                st.session_state.current_phase = PHASE_ANNOTATE
-                st.rerun()
+                    st.session_state.text_queue = deep_dive + refused
+                    st.session_state.text_queue_idx = 0
+                    st.session_state.pop("gallery_order", None)
+                    st.session_state.current_phase = PHASE_ANNOTATE
+                    st.rerun()

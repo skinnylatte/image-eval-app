@@ -85,7 +85,7 @@ def run():
                 for mk in ratable:
                     val = st.session_state.get(f"triage_{mk}")
                     if val is None:
-                        st.error(f"Please triage **{BLIND_NAMES[mk]}**.")
+                        st.error(f"Please rate **{BLIND_NAMES[mk]}** before continuing.")
                         all_triaged = False
                     else:
                         triage[mk] = val

@@ -55,7 +55,7 @@ def run():
     st.markdown("---")
     col1, col2 = st.columns([1, 2])
     with col1:
-        if st.button("Change my triage answers"):
+        if st.button("← Back to rating images"):
             st.session_state.current_phase = PHASE_GALLERY
             st.rerun()
     with col2:

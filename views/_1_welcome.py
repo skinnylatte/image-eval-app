@@ -61,7 +61,7 @@ def run():
 
         1. **Orientation** (30 min) - You're here now
         2. **Shared prompts** (15 min) - Everyone rates the same 5 prompts (for comparison)
-        3. **Free exploration** (75 min) - You write your own prompts and judge the outputs
+        3. **Test your ideas** (75 min) - You write your own prompts and judge the outputs
         4. **Group discussion** (60 min) - We identify patterns together
 
         ### What you'll do

@@ -45,10 +45,6 @@ if not _is_facilitator:
         st.session_state.current_phase = PHASE_WELCOME
         _redirected = True
 
-    elif st.session_state.current_phase == PHASE_SHARED and st.session_state.shared_prompts_completed:
-        st.session_state.current_phase = PHASE_EXPLORE
-        _redirected = True
-
     elif st.session_state.current_phase == PHASE_GALLERY and not st.session_state.current_prompt_results:
         st.session_state.current_phase = PHASE_EXPLORE
         _redirected = True
@@ -72,40 +68,55 @@ if phase != PHASE_WELCOME and not _is_facilitator and st.session_state.participa
         shared_done = st.session_state.shared_prompts_completed
         shared_idx = st.session_state.get("current_shared_prompt_idx", 0)
 
-        # Step indicator
-        if not shared_done:
-            st.markdown(f"**Step 1 of 2:** Shared prompts ({shared_idx} of {len(SHARED_PROMPTS)})")
+        in_active_task = phase in (PHASE_GALLERY, PHASE_ANNOTATE)
+
+        # Shared prompts
+        if phase == PHASE_SHARED:
+            st.markdown("● **Shared prompts**")
+            st.progress(shared_idx / len(SHARED_PROMPTS),
+                        text=f"{shared_idx} of {len(SHARED_PROMPTS)}")
+        elif in_active_task:
+            st.markdown("✓ Shared prompts" if shared_done else "○ Shared prompts")
         else:
-            st.markdown(f"**Step 2 of 2:** Free exploration")
+            label = "✓ Shared prompts" if shared_done else "○ Shared prompts"
+            if st.button(label, use_container_width=True, key="nav_shared"):
+                st.session_state.current_phase = PHASE_SHARED
+                st.rerun()
+
+        # Test your ideas
+        if phase == PHASE_EXPLORE:
+            st.markdown("● **Test your ideas**")
             st.progress(min(total_prompts / PROMPT_TARGET, 1.0),
-                        text=f"{total_prompts} of {PROMPT_TARGET} prompts")
-
-        st.caption(f"You've reviewed {count} image sets so far")
-
-        # Warm encouragement
-        if count == 0:
-            st.markdown("*Your perspective as an expert matters.*")
-        elif count < 10:
-            st.markdown("*Great start - keep going!*")
+                        text=f"{total_prompts} of {PROMPT_TARGET}")
+        elif in_active_task:
+            explore_done = total_prompts >= PROMPT_TARGET
+            st.markdown("✓ Test your ideas" if explore_done else "○ Test your ideas")
         else:
-            st.markdown("*Amazing work. You're making a real difference.*")
+            explore_done = total_prompts >= PROMPT_TARGET
+            label = "✓ Test your ideas" if explore_done else "○ Test your ideas"
+            if st.button(label, use_container_width=True, key="nav_explore"):
+                st.session_state.current_phase = PHASE_EXPLORE
+                st.rerun()
 
-        # Navigation - hide during rating flow (gallery/annotate)
-        if phase not in (PHASE_GALLERY, PHASE_ANNOTATE):
-            st.markdown("---")
-            if not shared_done and phase != PHASE_SHARED:
-                if st.button("Continue shared prompts", use_container_width=True, type="primary"):
-                    st.session_state.current_phase = PHASE_SHARED
-                    st.rerun()
-            if phase != PHASE_EXPLORE:
-                if st.button("Write a new prompt", use_container_width=True,
-                             type="primary" if shared_done else "secondary"):
-                    st.session_state.current_phase = PHASE_EXPLORE
-                    st.rerun()
-            if phase != PHASE_RESULTS:
-                if st.button("View my ratings", use_container_width=True):
-                    st.session_state.current_phase = PHASE_RESULTS
-                    st.rerun()
+        # Your results
+        if phase == PHASE_RESULTS:
+            st.markdown("● **Your results**")
+        elif in_active_task:
+            st.markdown("○ Your results")
+        else:
+            if st.button("○ Your results", use_container_width=True, key="nav_results"):
+                st.session_state.current_phase = PHASE_RESULTS
+                st.rerun()
+
+        st.markdown("---")
+        if in_active_task:
+            st.warning("Finish rating images to navigate away.")
+        elif count == 0:
+            st.caption("Your perspective as an expert matters.")
+        elif count < 10:
+            st.caption(f"{count} image sets reviewed · Great start!")
+        else:
+            st.caption(f"{count} image sets reviewed · Amazing work.")
 
 _PAGES = {
     PHASE_WELCOME: "_1_welcome",

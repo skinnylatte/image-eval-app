@@ -16,10 +16,11 @@ def run():
     idx = st.session_state.get("current_shared_prompt_idx", 0)
 
     if idx >= len(SHARED_PROMPTS):
-        st.success("You've completed all shared prompts. Moving to free exploration.")
+        st.success("You've completed all shared prompts.")
         st.session_state.shared_prompts_completed = True
-        st.session_state.current_phase = PHASE_EXPLORE
-        st.rerun()
+        if st.button("Continue to test your ideas", type="primary"):
+            st.session_state.current_phase = PHASE_EXPLORE
+            st.rerun()
         return
 
     shared = SHARED_PROMPTS[idx]
